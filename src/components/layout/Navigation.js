@@ -6,15 +6,15 @@ const Navigation = () => {
   
   // Check if the current path matches the link
   const isActive = (path) => {
-    return location.pathname === path;
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
   return (
-    <nav>
+    <nav className="main-nav">
       <div className="container">
         <ul className="nav-links">
           <li>
-            <Link to="/" className={isActive('/') ? 'active' : ''}>
+            <Link to="/" className={isActive('/') && location.pathname !== '/login' && location.pathname !== '/register' ? 'active' : ''}>
               Home
             </Link>
           </li>
@@ -24,7 +24,7 @@ const Navigation = () => {
             </Link>
           </li>
           <li>
-            <Link to="/collection" className={isActive('/collection') ? 'active' : ''}>
+            <Link to="/profile" className={isActive('/profile') ? 'active' : ''}>
               Collection
             </Link>
           </li>
