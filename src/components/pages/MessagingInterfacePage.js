@@ -1,237 +1,193 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { useMessages } from '../../context/MessageContext';
 
 const MessagingInterfacePage = () => {
-  const [message, setMessage] = useState('');
-  const [activeConversationId, setActiveConversationId] = useState('1');
+  const { userId } = useParams();
+  const { messages, sendMessage, markAsRead } = useMessages();
+  const [newMessage, setNewMessage] = useState('');
+  const [activeContact, setActiveContact] = useState(null);
+  const messagesEndRef = useRef(null);
   
-  // Mock conversations data
-  const conversations = [
-    {
-      id: '1',
-      user: {
-        id: '789',
-        username: 'MomoCollector',
-        profilePicture: 'https://via.placeholder.com/50x50'
-      },
-      lastMessage: {
-        text: 'Yes, I have both! I\'ve added them to the trade offer.',
-        timestamp: '2025-04-15T14:40:00Z',
-        isRead: true
-      },
-      messages: [
-        {
-          id: 1,
-          sender: 'TwiceFan123',
-          text: 'Hi! I\'m interested in your Momo card. Would you like to trade?',
-          timestamp: '2025-04-15T14:30:00Z'
-        },
-        {
-          id: 2,
-          sender: 'MomoCollector',
-          text: 'Sure! I\'m looking for Nayeon and Jeongyeon cards. Do you have any?',
-          timestamp: '2025-04-15T14:35:00Z'
-        },
-        {
-          id: 3,
-          sender: 'TwiceFan123',
-          text: 'Yes, I have both! I\'ve added them to the trade offer.',
-          timestamp: '2025-04-15T14:40:00Z'
-        }
-      ]
-    },
-    {
-      id: '2',
-      user: {
-        id: '101',
-        username: 'TwiceForever',
-        profilePicture: 'https://via.placeholder.com/50x50'
-      },
-      lastMessage: {
-        text: 'Do you have any Sana cards from the "Yes, I Am" album?',
-        timestamp: '2025-04-14T10:15:00Z',
-        isRead: false
-      },
-      messages: [
-        {
-          id: 1,
-          sender: 'TwiceForever',
-          text: 'Hello! I saw you have a lot of TWICE cards.',
-          timestamp: '2025-04-14T10:10:00Z'
-        },
-        {
-          id: 2,
-          sender: 'TwiceForever',
-          text: 'Do you have any Sana cards from the "Yes, I Am" album?',
-          timestamp: '2025-04-14T10:15:00Z'
-        }
-      ]
-    },
-    {
-      id: '3',
-      user: {
-        id: '102',
-        username: 'JihyoFan',
-        profilePicture: 'https://via.placeholder.com/50x50'
-      },
-      lastMessage: {
-        text: 'Thanks for the trade! The card arrived safely.',
-        timestamp: '2025-04-10T16:20:00Z',
-        isRead: true
-      },
-      messages: [
-        {
-          id: 1,
-          sender: 'JihyoFan',
-          text: 'Thanks for the trade! The card arrived safely.',
-          timestamp: '2025-04-10T16:20:00Z'
-        }
-      ]
+  // Get unique contacts from messages
+  const contacts = [...new Set(
+    messages.map(msg => 
+      msg.sender._id === 'user1' 
+        ? msg.receiver._id 
+        : msg.sender._id
+    )
+  )].map(contactId => {
+    const contactMsg = messages.find(msg => 
+      msg.sender._id === contactId || msg.receiver._id === contactId
+    );
+    return {
+      _id: contactId,
+      username: contactId === 'user1' 
+        ? 'You' 
+        : (contactMsg.sender._id === contactId 
+          ? contactMsg.sender.username 
+          : contactMsg.receiver.username),
+      avatar: contactId === 'user1' 
+        ? 'https://via.placeholder.com/40' 
+        : (contactMsg.sender._id === contactId 
+          ? contactMsg.sender.avatar 
+          : contactMsg.receiver.avatar) ,
+      lastMessage: messages
+        .filter(msg => msg.sender._id === contactId || msg.receiver._id === contactId)
+        .sort((a, b) => new Date(b.date) - new Date(a.date))[0],
+      unreadCount: messages.filter(msg => 
+        msg.sender._id === contactId && !msg.read
+      ).length
+    };
+  });
+  
+  // Set active contact based on URL parameter or first contact
+  useEffect(() => {
+    if (userId && contacts.find(c => c._id === userId)) {
+      setActiveContact(contacts.find(c => c._id === userId));
+    } else if (contacts.length > 0 && !activeContact) {
+      setActiveContact(contacts[0]);
     }
-  ];
+  }, [userId, contacts, activeContact]);
   
-  // Get active conversation
-  const getActiveConversation = ()  => {
-    return conversations.find(conv => conv.id === activeConversationId) || null;
-  };
-  
-  // Format timestamp
-  const formatTimestamp = (timestamp) => {
-    const date = new Date(timestamp);
-    return date.toLocaleString();
-  };
-  
-  // Format preview timestamp (relative time)
-  const formatPreviewTimestamp = (timestamp) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) {
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } else if (diffDays === 1) {
-      return 'Yesterday';
-    } else if (diffDays < 7) {
-      return date.toLocaleDateString([], { weekday: 'short' });
-    } else {
-      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  // Mark messages as read when viewing conversation
+  useEffect(() => {
+    if (activeContact) {
+      messages
+        .filter(msg => msg.sender._id === activeContact._id && !msg.read)
+        .forEach(msg => markAsRead(msg._id));
     }
-  };
+  }, [activeContact, messages, markAsRead]);
   
-  // Handle message input
-  const handleMessageChange = (e) => {
-    setMessage(e.target.value);
-  };
+  // Scroll to bottom of messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, activeContact]);
   
-  // Handle message submit
-  const handleMessageSubmit = (e) => {
+  // Get conversation messages
+  const conversationMessages = activeContact 
+    ? messages.filter(msg => 
+        (msg.sender._id === 'user1' && msg.receiver._id === activeContact._id) ||
+        (msg.sender._id === activeContact._id && msg.receiver._id === 'user1')
+      ).sort((a, b) => new Date(a.date) - new Date(b.date))
+    : [];
+  
+  // Handle sending a new message
+  const handleSendMessage = (e) => {
     e.preventDefault();
-    if (message.trim() === '') return;
-    
-    // In a real app, this would send the message to the API
-    console.log('Sending message:', message);
-    
-    // Clear the input
-    setMessage('');
+    if (newMessage.trim() && activeContact) {
+      sendMessage(activeContact._id, newMessage);
+      setNewMessage('');
+    }
   };
   
-  const activeConversation = getActiveConversation();
-  
+  // Format date for display
+  const formatMessageDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + 
+           ' ' + date.toLocaleDateString();
+  };
+
   return (
-    <main className="messaging-interface">
-      <div className="conversations-sidebar">
-        <div className="sidebar-header">
-          <h2>Messages</h2>
+    <main className="container">
+      <h2 className="section-title">Messages</h2>
+      
+      <div className="messaging-interface">
+        <div className="contacts-list">
+          <div className="contacts-header">
+            <h3>Conversations</h3>
+          </div>
+          
+          {contacts.length > 0 ? (
+            <div className="contacts">
+              {contacts
+                .filter(contact => contact._id !== 'user1') // Don't show self
+                .map(contact => (
+                  <div 
+                    key={contact._id} 
+                    className={`contact-item ${activeContact && activeContact._id === contact._id ? 'active' : ''}`}
+                    onClick={() => setActiveContact(contact)}
+                  >
+                    <div className="contact-avatar">
+                      <img src={contact.avatar} alt={contact.username} />
+                      {contact.unreadCount > 0 && (
+                        <span className="unread-badge">{contact.unreadCount}</span>
+                      )}
+                    </div>
+                    <div className="contact-info">
+                      <div className="contact-name">{contact.username}</div>
+                      <div className="contact-last-message">
+                        {contact.lastMessage.content.length > 25
+                          ? contact.lastMessage.content.substring(0, 25) + '...'
+                          : contact.lastMessage.content}
+                      </div>
+                    </div>
+                    <div className="contact-time">
+                      {new Date(contact.lastMessage.date).toLocaleDateString()}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          ) : (
+            <div className="no-contacts">
+              <p>No conversations yet.</p>
+            </div>
+          )}
         </div>
         
-        <div className="conversations-list">
-          {conversations.map(conv => (
-            <div 
-              key={conv.id} 
-              className={`conversation-item ${activeConversationId === conv.id ? 'active' : ''} ${!conv.lastMessage.isRead && conv.user.username !== 'TwiceFan123' ? 'unread' : ''}`}
-              onClick={() => setActiveConversationId(conv.id)}
-            >
-              <img 
-                src={conv.user.profilePicture} 
-                alt={`${conv.user.username}'s profile`} 
-                className="user-avatar" 
-              />
-              
-              <div className="conversation-info">
-                <div className="conversation-header">
-                  <h3 className="username">{conv.user.username}</h3>
-                  <span className="timestamp">{formatPreviewTimestamp(conv.lastMessage.timestamp)}</span>
+        <div className="message-area">
+          {activeContact ? (
+            <>
+              <div className="message-header">
+                <div className="message-contact">
+                  <img src={activeContact.avatar} alt={activeContact.username} className="contact-avatar-img" />
+                  <span className="contact-name">{activeContact.username}</span>
                 </div>
-                
-                <p className="message-preview">
-                  {conv.lastMessage.text.length > 40 
-                    ? conv.lastMessage.text.substring(0, 40) + '...' 
-                    : conv.lastMessage.text
-                  }
-                </p>
-              </div>
-              
-              {!conv.lastMessage.isRead && conv.user.username !== 'TwiceFan123' && (
-                <div className="unread-indicator"></div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      <div className="chat-area">
-        {activeConversation ? (
-          <>
-            <div className="chat-header">
-              <div className="user-info">
-                <img 
-                  src={activeConversation.user.profilePicture} 
-                  alt={`${activeConversation.user.username}'s profile`} 
-                  className="user-avatar" 
-                />
-                <h3 className="username">{activeConversation.user.username}</h3>
-              </div>
-              
-              <div className="chat-actions">
-                <Link to={`/profile/${activeConversation.user.id}`} className="view-profile-btn">
+                <Link to={`/profile/${activeContact._id}`} className="view-profile-link">
                   View Profile
                 </Link>
-                <Link to={`/trades/new/${activeConversation.user.id}`} className="propose-trade-btn">
-                  Propose Trade
-                </Link>
               </div>
-            </div>
-            
-            <div className="messages-container">
-              {activeConversation.messages.map(msg => (
-                <div 
-                  key={msg.id} 
-                  className={`message ${msg.sender === 'TwiceFan123' ? 'sent' : 'received'}`}
-                >
-                  <div className="message-content">
-                    <p className="message-text">{msg.text}</p>
-                    <span className="message-time">{formatTimestamp(msg.timestamp)}</span>
+              
+              <div className="messages-container">
+                {conversationMessages.length > 0 ? (
+                  <div className="messages">
+                    {conversationMessages.map((msg, index) => (
+                      <div 
+                        key={index} 
+                        className={`message ${msg.sender._id === 'user1' ? 'sent' : 'received'}`}
+                      >
+                        <div className="message-content">{msg.content}</div>
+                        <div className="message-time">{formatMessageDate(msg.date)}</div>
+                      </div>
+                    ))}
+                    <div ref={messagesEndRef} />
                   </div>
-                </div>
-              ))}
+                ) : (
+                  <div className="no-messages">
+                    <p>No messages yet. Start the conversation!</p>
+                  </div>
+                )}
+              </div>
+              
+              <form className="message-input-form" onSubmit={handleSendMessage}>
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type a message..."
+                  className="message-input"
+                />
+                <button type="submit" className="send-button">
+                  Send
+                </button>
+              </form>
+            </>
+          ) : (
+            <div className="no-conversation-selected">
+              <p>Select a conversation to start messaging</p>
             </div>
-            
-            <form className="message-form" onSubmit={handleMessageSubmit}>
-              <input 
-                type="text" 
-                placeholder="Type a message..." 
-                value={message}
-                onChange={handleMessageChange}
-                className="message-input"
-              />
-              <button type="submit" className="btn btn-primary send-btn">Send</button>
-            </form>
-          </>
-        ) : (
-          <div className="no-conversation-selected">
-            <p>Select a conversation to start messaging</p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </main>
   );

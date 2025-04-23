@@ -1,144 +1,134 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAlbums } from '../../context/AlbumContext';
+import { useUser } from '../../context/UserContext';
+import { useMessages } from '../../context/MessageContext';
 
 const HomePage = () => {
-  // Mock data for featured albums
-  const featuredAlbums = [
-    {
-      id: 1,
-      title: 'Yes, I Am',
-      year: '2023',
-      image: 'https://via.placeholder.com/200x200'
-    },
-    {
-      id: 2,
-      title: 'Between 1&2',
-      year: '2022',
-      image: 'https://via.placeholder.com/200x200'
-    },
-    {
-      id: 3,
-      title: 'Formula of Love',
-      year: '2021',
-      image: 'https://via.placeholder.com/200x200'
-    },
-    {
-      id: 4,
-      title: 'Dive',
-      year: '2024',
-      image: 'https://via.placeholder.com/200x200'
-    }
-  ];
-
-  // Mock data for most wanted cards
-  const wantedCards = [
-    {
-      id: 1,
-      member: 'Nayeon',
-      album: 'Yes, I Am',
-      image: 'https://via.placeholder.com/200x200',
-      status: 'owned',
-      quantity: 2
-    },
-    {
-      id: 2,
-      member: 'Jeongyeon',
-      album: 'Yes, I Am',
-      image: 'https://via.placeholder.com/200x200',
-      status: 'wanted'
-    },
-    {
-      id: 3,
-      member: 'Momo',
-      album: 'Yes, I Am',
-      image: 'https://via.placeholder.com/200x200',
-      status: 'not-interested'
-    },
-    {
-      id: 4,
-      member: 'Sana',
-      album: 'Yes, I Am',
-      image: 'https://via.placeholder.com/200x200',
-      status: 'owned'
-    }
-  ];
-
-  // Mock data for recent trades
-  const recentTrades = [
-    {
-      id: 1,
-      user1: 'User1',
-      card1: 'Nayeon (Yes, I Am) ',
-      user2: 'User2',
-      card2: 'Jihyo (Formula of Love)'
-    },
-    {
-      id: 2,
-      user1: 'User3',
-      card1: 'Tzuyu (Between 1&2)',
-      user2: 'User4',
-      card2: 'Mina (Dive)'
-    },
-    {
-      id: 3,
-      user1: 'User5',
-      card1: 'Dahyun (Dive)',
-      user2: 'User6',
-      card2: 'Chaeyoung (Yes, I Am)'
-    }
-  ];
-
+  const { albums } = useAlbums();
+  const { user } = useUser();
+  const { messages } = useMessages();
+  
+  // Get featured albums (newest 3)
+  const featuredAlbums = [...albums]
+    .sort((a, b) => new Date(b.release_date) - new Date(a.release_date))
+    .slice(0, 3);
+  
+  // Get most wanted cards (first 4 from wishlist)
+  const mostWantedCards = user.wishlist.slice(0, 4);
+  
+  // Get recent messages (newest 3)
+  const recentMessages = [...messages]
+    .sort((a, b) => new Date(b.date) - new Date(a.date))
+    .slice(0, 3);
+  
   return (
     <main className="container">
-      <section>
-        <h2 className="section-title">Featured Albums</h2>
+      <section className="hero">
+        <div className="hero-content">
+          <h1>Welcome to ONCEtrade</h1>
+          <p>The ultimate platform for TWICE photocard collectors and traders</p>
+          <div className="hero-buttons">
+            <Link to="/albums" className="btn btn-primary">Browse Albums</Link>
+            <Link to="/trades/new" className="btn btn-secondary">Start Trading</Link>
+          </div>
+        </div>
+      </section>
+      
+      <section className="featured-section">
+        <div className="section-header">
+          <h2 className="section-title">Featured Albums</h2>
+          <Link to="/albums" className="view-all">View All</Link>
+        </div>
+        
         <div className="album-grid">
           {featuredAlbums.map(album => (
-            <div key={album.id} className="album-card">
-              <img src={album.image} alt={`${album.title} Album`} className="album-img" />
-              <div className="album-info">
-                <h3 className="album-title">{album.title}</h3>
-                <p className="album-date">{album.year}</p>
-              </div>
+            <div key={album._id} className="album-card">
+              <Link to={`/albums/${album._id}`}>
+                <img src={album.cover_image} alt={album.name} className="album-cover" />
+                <div className="album-info">
+                  <h3 className="album-title">{album.name}</h3>
+                  <p className="album-date">{new Date(album.release_date).getFullYear()}</p>
+                  <p className="album-cards">{album.total_cards} cards</p>
+                </div>
+              </Link>
             </div>
           ))}
         </div>
       </section>
       
-      <section>
-        <h2 className="section-title">Most Wanted Cards</h2>
-        <div className="card-grid">
-          {wantedCards.map(card => (
-            <div key={card.id} className={`photocard card-${card.status}`}>
-              <img src={card.image} alt={`${card.member} Card`} className="card-img" />
-              {card.status === 'owned' && (
-                <div className="status-icon owned-icon">✓</div>
-              )}
-              {card.status === 'wanted' && (
-                <div className="status-icon wanted-icon">★</div>
-              )}
-              {card.quantity > 1 && (
-                <div className="quantity-badge">x{card.quantity}</div>
-              )}
-              <div className="card-info">
-                <h3 className="card-title">{card.member}</h3>
-                <p className="card-album">{card.album}</p>
+      <div className="two-column-layout">
+        <section className="wanted-section">
+          <div className="section-header">
+            <h2 className="section-title">Most Wanted</h2>
+            <Link to="/wishlist" className="view-all">View Wishlist</Link>
+          </div>
+          
+          <div className="wanted-cards">
+            {mostWantedCards.map(card => (
+              <div key={card._id} className="wanted-card">
+                <img src={card.image} alt={`${card.member} from ${card.album}`} className="wanted-img" />
+                <div className="wanted-info">
+                  <h3 className="wanted-title">{card.member}</h3>
+                  <p className="wanted-album">{card.album}</p>
+                  <span className={`available-count ${card.available_trades > 0 ? 'available' : 'unavailable'}`}>
+                    {card.available_trades > 0 
+                      ? `${card.available_trades} available` 
+                      : 'Not available'}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </section>
-      
-      <section>
-        <h2 className="section-title">Recent Trades</h2>
-        <div className="trades-list">
-          {recentTrades.map(trade => (
-            <div key={trade.id} className="trade-item">
-              <p>{trade.user1} traded {trade.card1} with {trade.user2} for {trade.card2}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+            ))}
+          </div>
+        </section>
+        
+        <section className="messages-section">
+          <div className="section-header">
+            <h2 className="section-title">Recent Messages</h2>
+            <Link to="/messages" className="view-all">View All</Link>
+          </div>
+          
+          <div className="recent-messages">
+            {recentMessages.length > 0 ? (
+              recentMessages.map((message, index) => (
+                <div key={index} className="message-preview">
+                  <div className="message-sender">
+                    <img 
+                      src={message.sender._id === 'user1' ? message.receiver.avatar : message.sender.avatar} 
+                      alt="User avatar" 
+                      className="sender-avatar" 
+                    />
+                    <div className="sender-info">
+                      <span className="sender-name">
+                        {message.sender._id === 'user1' ? 'You → ' + message.receiver.username : message.sender.username}
+                      </span>
+                      <span className="message-date">
+                        {new Date(message.date).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="message-text">
+                    {message.content.length > 50 
+                      ? message.content.substring(0, 50) + '...' 
+                      : message.content}
+                  </p>
+                  <Link 
+                    to={`/messages/${message.sender._id === 'user1' ? message.receiver._id : message.sender._id}`} 
+                    className="view-message"
+                  >
+                    View Conversation
+                  </Link>
+                </div>
+              ))
+            ) : (
+              <div className="no-messages-home">
+                <p>No messages yet.</p>
+                <Link to="/messages" className="btn btn-secondary">Start Messaging</Link>
+              </div>
+            )}
+          </div>
+        </section>
+      </div>
     </main>
   );
 };
