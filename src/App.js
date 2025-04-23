@@ -7,6 +7,7 @@ import Layout from './components/layout/Layout';
 
 // Pages
 import HomePage from './components/pages/HomePage';
+import AlbumsListPage from './components/pages/AlbumsListPage';
 import AlbumViewPage from './components/pages/AlbumViewPage';
 import UserProfilePage from './components/pages/UserProfilePage';
 import TradeInterfacePage from './components/pages/TradeInterfacePage';
@@ -19,17 +20,17 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Layout><HomePage /></Layout>} />
+        <Route path="/albums" element={<Layout><AlbumsListPage /></Layout>} />
+        <Route path="/albums/:albumId" element={<Layout><AlbumViewPage /></Layout>} />
         <Route path="/profile" element={<Layout><UserProfilePage /></Layout>} />
         <Route path="/profile/:userId" element={<Layout><UserProfilePage /></Layout>} />
         <Route path="/trades/:tradeId" element={<Layout><TradeInterfacePage /></Layout>} />
         <Route path="/messages" element={<Layout><MessagingInterfacePage /></Layout>} />
         <Route path="/messages/:userId" element={<Layout><MessagingInterfacePage /></Layout>} />
-        <Route path="/albums/:albumId" element={<Layout><AlbumViewPage /></Layout>} />
         <Route path="/login" element={<Layout><LoginPage /></Layout>} />
         <Route path="/register" element={<Layout><RegisterPage /></Layout>} />
         
         {/* Placeholder routes - these will redirect to home for now */}
-        <Route path="/albums" element={<Layout><HomePage /></Layout>} />
         <Route path="/wishlist" element={<Layout><HomePage /></Layout>} />
         <Route path="/trades" element={<Layout><HomePage /></Layout>} />
       </Routes>
