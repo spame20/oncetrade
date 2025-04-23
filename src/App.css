@@ -1095,3 +1095,110 @@ header {
   margin-bottom: 15px;
   color: #666;
 }
+/* Wishlist Page Styles */
+.wishlist-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.wishlist-stats {
+  background-color: var(--secondary);
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+.wishlist-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  background-color: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.search-filter-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex-grow: 1;
+}
+
+.wishlist-search {
+  padding: 10px 15px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  width: 250px;
+  font-size: 16px;
+}
+
+.filter-box {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-select, .sort-select {
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.sort-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-wanted {
+  border: 2px solid var(--primary);
+}
+
+.available-trades {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.available-count {
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 10px;
+}
+
+.available {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.unavailable {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.wishlist-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.find-trade-btn {
+  background-color: var(--secondary);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.card-rarity {
+  font-size: 12px;
+  color: #666;
+  font-style: italic;
+}
