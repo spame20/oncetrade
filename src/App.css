@@ -1035,3 +1035,63 @@ header {
   border-radius: 10px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
+/* User Profile Additional Styles */
+.card-for-trade {
+  border: 2px solid var(--secondary);
+}
+
+.card-actions {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.trade-toggle {
+  background: none;
+  border: 1px solid var(--border);
+  padding: 5px 10px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.3s;
+}
+
+.trade-toggle.active {
+  background-color: var(--secondary);
+  color: white;
+  border-color: var(--secondary);
+}
+
+.remove-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.joined-date {
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.no-trades-message, .no-cards-message {
+  text-align: center;
+  padding: 30px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin: 20px 0;
+}
+
+.no-trades-message p, .no-cards-message p {
+  margin-bottom: 15px;
+  color: #666;
+}
