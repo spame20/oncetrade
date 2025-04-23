@@ -11,6 +11,7 @@ import AlbumsListPage from './components/pages/AlbumsListPage';
 import AlbumViewPage from './components/pages/AlbumViewPage';
 import UserProfilePage from './components/pages/UserProfilePage';
 import WishlistPage from './components/pages/WishlistPage';
+import TradesListPage from './components/pages/TradesListPage';
 import TradeInterfacePage from './components/pages/TradeInterfacePage';
 import MessagingInterfacePage from './components/pages/MessagingInterfacePage';
 import LoginPage from './components/pages/LoginPage';
@@ -26,14 +27,12 @@ function App() {
         <Route path="/profile" element={<Layout><UserProfilePage /></Layout>} />
         <Route path="/profile/:userId" element={<Layout><UserProfilePage /></Layout>} />
         <Route path="/wishlist" element={<Layout><WishlistPage /></Layout>} />
+        <Route path="/trades" element={<Layout><TradesListPage /></Layout>} />
         <Route path="/trades/:tradeId" element={<Layout><TradeInterfacePage /></Layout>} />
         <Route path="/messages" element={<Layout><MessagingInterfacePage /></Layout>} />
         <Route path="/messages/:userId" element={<Layout><MessagingInterfacePage /></Layout>} />
         <Route path="/login" element={<Layout><LoginPage /></Layout>} />
         <Route path="/register" element={<Layout><RegisterPage /></Layout>} />
-        
-        {/* Placeholder routes - these will redirect to home for now */}
-        <Route path="/trades" element={<Layout><HomePage /></Layout>} />
       </Routes>
     </Router>
   );
