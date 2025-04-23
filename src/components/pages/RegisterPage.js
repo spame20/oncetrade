@@ -1,89 +1,38 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { Link } from 'react-router-dom';
 
 const RegisterPage = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    location: '',
-    agreeTerms: false
-  });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-  const { register } = useAuth();
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === 'checkbox' ? checked : value
-    });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // Validation
-    if (!formData.username || !formData.email || !formData.password || !formData.location) {
-      setError('Please fill in all required fields');
+    if (password !== confirmPassword) {
+      alert('Passwords do not match');
       return;
     }
-    
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters long');
-      return;
-    }
-    
-    if (!formData.agreeTerms) {
-      setError('You must agree to the Terms of Service');
-      return;
-    }
-    
-    try {
-      setError('');
-      setLoading(true);
-      
-      await register({
-        username: formData.username,
-        email: formData.email,
-        password: formData.password,
-        location: formData.location
-      });
-      
-      navigate('/login');
-    } catch (err) {
-      setError('Registration failed. Please try again.');
-      console.error('Registration error:', err);
-    } finally {
-      setLoading(false);
-    }
+    console.log('Registration attempt with:', { username, email, password });
+    // In a real app, this would send the data to an API
+    alert('Registration functionality will be implemented in the future');
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-container">
-        <h1>Create an Account</h1>
+    <main className="auth-container">
+      <div className="auth-form-container">
+        <h2>Create an Account</h2>
+        <p>Join the TWICE photocard trading community!</p>
         
-        {error && <div className="alert alert-danger">{error}</div>}
-        
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
             <label htmlFor="username">Username</label>
             <input
               type="text"
               id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Choose a username"
               required
             />
           </div>
@@ -93,9 +42,9 @@ const RegisterPage = () => {
             <input
               type="email"
               id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
               required
             />
           </div>
@@ -105,9 +54,9 @@ const RegisterPage = () => {
             <input
               type="password"
               id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Create a password"
               required
             />
           </div>
@@ -117,53 +66,25 @@ const RegisterPage = () => {
             <input
               type="password"
               id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm your password"
               required
             />
           </div>
           
-          <div className="form-group">
-            <label htmlFor="location">Location</label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          
-          <div className="form-group checkbox">
-            <input
-              type="checkbox"
-              id="agreeTerms"
-              name="agreeTerms"
-              checked={formData.agreeTerms}
-              onChange={handleChange}
-              required
-            />
-            <label htmlFor="agreeTerms">
-              I agree to the Terms of Service and Privacy Policy
-            </label>
-          </div>
-          
-          <button 
-            type="submit" 
-            className="btn btn-primary"
-            disabled={loading}
-          >
-            {loading ? 'Registering...' : 'Register'}
+          <button type="submit" className="btn btn-primary btn-block">
+            Register
           </button>
         </form>
         
         <div className="auth-links">
-          <p>Already have an account? <Link to="/login">Login</Link></p>
+          <p>
+            Already have an account? <Link to="/login">Log In</Link>
+          </p>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 
