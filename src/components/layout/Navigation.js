@@ -14,7 +14,7 @@ const Navigation = () => {
       <div className="container">
         <ul className="nav-links">
           <li>
-            <Link to="/" className={isActive('/') && location.pathname !== '/login' && location.pathname !== '/register' ? 'active' : ''}>
+            <Link to="/" className={isActive('/') ? 'active' : ''}>
               Home
             </Link>
           </li>
