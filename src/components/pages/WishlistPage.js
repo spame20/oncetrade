@@ -1,82 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useUser } from '../../context/UserContext';
 
 const WishlistPage = () => {
-  // Mock wishlist data
-  const [wishlist, setWishlist] = useState([
-    {
-      _id: '1',
-      member: 'Nayeon',
-      album: 'Formula of Love',
-      image: 'https://via.placeholder.com/200x200',
-      rarity: 'Regular',
-      available_trades: 3
-    },
-    {
-      _id: '2',
-      member: 'Jeongyeon',
-      album: 'Between 1&2',
-      image: 'https://via.placeholder.com/200x200',
-      rarity: 'Limited',
-      available_trades: 1
-    },
-    {
-      _id: '3',
-      member: 'Momo',
-      album: 'Yes, I Am',
-      image: 'https://via.placeholder.com/200x200',
-      rarity: 'Regular',
-      available_trades: 5
-    },
-    {
-      _id: '4',
-      member: 'Sana',
-      album: 'Dive',
-      image: 'https://via.placeholder.com/200x200',
-      rarity: 'Regular',
-      available_trades: 2
-    },
-    {
-      _id: '5',
-      member: 'Jihyo',
-      album: 'Formula of Love',
-      image: 'https://via.placeholder.com/200x200',
-      rarity: 'Limited',
-      available_trades: 0
-    },
-    {
-      _id: '6',
-      member: 'Mina',
-      album: 'Between 1&2',
-      image: 'https://via.placeholder.com/200x200',
-      rarity: 'Regular',
-      available_trades: 4
-    },
-    {
-      _id: '7',
-      member: 'Dahyun',
-      album: 'Yes, I Am',
-      image: 'https://via.placeholder.com/200x200',
-      rarity: 'Regular',
-      available_trades: 2
-    },
-    {
-      _id: '8',
-      member: 'Chaeyoung',
-      album: 'Dive',
-      image: 'https://via.placeholder.com/200x200',
-      rarity: 'Limited',
-      available_trades: 1
-    },
-    {
-      _id: '9',
-      member: 'Tzuyu',
-      album: 'Formula of Love',
-      image: 'https://via.placeholder.com/200x200',
-      rarity: 'Regular',
-      available_trades: 3
-    }
-  ]) ;
+  // Get user data and functions from context
+  const { user, removeFromWishlist } = useUser();
+  const wishlist = user.wishlist;
   
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState('');
@@ -115,11 +44,6 @@ const WishlistPage = () => {
           return 0;
       }
     });
-  
-  // Remove card from wishlist
-  const removeFromWishlist = (cardId) => {
-    setWishlist(wishlist.filter(card => card._id !== cardId));
-  };
 
   return (
     <main className="container">
