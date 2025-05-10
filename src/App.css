@@ -4,6 +4,9 @@
   --text: #333333;
   --light-gray: #f5f5f5;
   --border: #e0e0e0;
+  --twice-apricot: #FCC89B;
+--twice-neon-magenta: #FF5FA2;
+
 }
 
 * {
@@ -1930,4 +1933,228 @@ header {
 .no-messages-home {
   text-align: center;
   padding: 20px;
+}
+/* UserProfilePage.css - Add to your main App.css or create a new CSS file and import it */
+
+.user-profile-page .profile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.profile-avatar-large {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin-right: 20px;
+  object-fit: cover;
+}
+
+.profile-info h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.profile-average-rating {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.profile-tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-button {
+  padding: 10px 20px;
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #777;
+  border-bottom: 2px solid transparent; /* For active indicator */
+  margin-right: 10px;
+  transition: color 0.3s, border-bottom-color 0.3s;
+}
+
+.tab-button.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: bold;
+}
+
+.tab-button:hover {
+  color: var(--primary-dark);
+}
+
+.profile-tab-content {
+  padding-top: 20px;
+}
+
+/* Styles for RatingDisplay component within UserProfilePage */
+.ratings-display-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.rating-item-display {
+  background-color: #f9f9f9;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.rating-header-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.rating-stars-display .star {
+  font-size: 1.2rem;
+  color: #ccc;
+}
+
+.rating-stars-display .star.selected {
+  color: #ffc107;
+}
+
+.rating-rater {
+  font-size: 0.9rem;
+  color: #555;
+  margin-left: 10px;
+}
+
+.rating-date-display {
+  font-size: 0.8rem;
+  color: #777;
+  margin-left: auto; /* Pushes date to the right */
+}
+
+.rating-comment-text {
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.5;
+  margin-top: 5px;
+  white-space: pre-wrap; /* Preserves whitespace and newlines in comments */
+}
+
+.no-ratings-message {
+  text-align: center;
+  color: #777;
+  padding: 20px;
+  font-style: italic;
+}
+
+/* Card Grid for Collection/Wishlist on Profile */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.card-item-profile {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+}
+
+.card-item-profile img {
+    max-width: 100%;
+    height: 120px; /* Fixed height for consistency */
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.card-item-profile p {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.card-item-profile .availability {
+    font-size: 0.8rem;
+    padding: 3px 6px;
+    border-radius: 4px;
+}
+
+.card-item-profile .availability.available {
+    background-color: #28a745; /* Green for available */
+    color: white;
+}
+
+.card-item-profile .availability.unavailable {
+    background-color: #dc3545; /* Red for unavailable */
+    color: white;
+}
+
+/* Styles for Trades List on Profile */
+.trades-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.trade-item-profile {
+  background-color: #f9f9f9;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 15px;
+}
+
+.trade-item-profile p {
+  margin: 5px 0;
+}
+
+.trade-item-profile .btn-secondary {
+  margin-top: 10px;
+}
+/* Attempt to fix username visibility in trade sections */
+.trade-item-profile p strong, 
+.trade-details-section h2, /* If "Trading with: USERNAME" is an h2 */
+.trade-interface-page h2 { /* For the "Trade with USERNAME" title */
+  color: #333; /* A dark grey, adjust as needed */
+}
+
+/* If the partner username is in a specific span or div inside the trade item */
+.trade-item-profile .partner-username { /* You might need to add this class in your JSX */
+    color: #333 !important; 
+}
+/* Fix for text visibility on Trades List Page */
+
+/* Ensure usernames in the trade list are dark */
+.trade-item .trade-users .username {
+  color: var(--text); /* Uses your defined dark text color */
+}
+
+/* Ensure card member names in the trade list are dark */
+.trade-item .trade-card .card-member {
+  color: var(--text); /* Uses your defined dark text color */
+}
+
+/* Improve contrast for album names in the trade list */
+.trade-item .trade-card .card-album {
+  color: var(--text); /* Uses your defined dark text color for better contrast */
+}
+/* Styles for Owned Card Gradient Border */
+.photocard-owned-gradient-border {
+  border: 3px solid transparent; /* Border width, transparent base */
+  border-image-slice: 1; /* Ensures the entire border area is covered by the image */
+  border-image-source: linear-gradient(to right, var(--twice-apricot), var(--twice-neon-magenta));
+  padding: 2px; /* Optional: if you want a little space between the border and the card image */
+  background-clip: padding-box; /* Ensures background of the card doesn't overlap the border area if you add padding */
+}
+
+/* Optional: Adjust padding inside the card if you added padding for the border */
+/* If you add padding in the class above, you might want to ensure the card content respects it */
+.photocard-owned-gradient-border .card-img {
+  /* If you added 2px padding above, you might want to adjust image or container dimensions slightly */
+  /* For now, let's see how it looks without adjustments here */
 }

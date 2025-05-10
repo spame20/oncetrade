@@ -4,6 +4,7 @@ import { PhotocardProvider } from './PhotocardContext';
 import { UserProvider } from './UserContext';
 import { TradeProvider } from './TradeContext';
 import { MessageProvider } from './MessageContext';
+import { RatingProvider } from './RatingContext'; // Import the new RatingProvider
 
 // Create a combined provider component
 export const AppProvider = ({ children }) => {
@@ -13,7 +14,9 @@ export const AppProvider = ({ children }) => {
         <UserProvider>
           <TradeProvider>
             <MessageProvider>
-              {children}
+              <RatingProvider> {/* Add RatingProvider here */}
+                {children}
+              </RatingProvider>
             </MessageProvider>
           </TradeProvider>
         </UserProvider>

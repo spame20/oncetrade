@@ -1,291 +1,281 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { useTrades } from '../../context/TradeContext';
-import { useUser } from '../../context/UserContext';
-import { useMessages } from '../../context/MessageContext';
+import { useTrades } from '../../context/TradeContext'; // Fixed import
+import { useUser } from '../../context/UserContext'; // Fixed import
+import { useMessages } from '../../context/MessageContext'; // Fixed import
+import { useRatings } from '../../context/RatingContext'; // Fixed import
+import RatingForm from '../ratings/RatingForm';
 
 const TradeInterfacePage = () => {
   const { tradeId } = useParams();
   const navigate = useNavigate();
   const { trades, setTrades } = useTrades();
-  const { user } = useUser();
+  const { user } = useUser(); // Logged-in user from UserContext
   const { sendMessage } = useMessages();
-  
-  // Find the current trade
-  const trade = trades.find(t => t._id === tradeId) || null;
-  
-  // State for new trade
+  const { getRatingForTradeByRater } = useRatings();
+
+  const [trade, setTrade] = useState(null);
   const [selectedUserCards, setSelectedUserCards] = useState([]);
   const [selectedPartnerCards, setSelectedPartnerCards] = useState([]);
   const [message, setMessage] = useState('');
-  
-  // Mock trading partner for new trades
-  const [tradingPartner, setTradingPartner] = useState({
-    _id: 'u1',
-    username: 'TWICE_Fan99',
-    avatar: 'https://via.placeholder.com/40',
-    collection: [
-      {
-        _id: 'pc2',
-        member: 'Jeongyeon',
-        album: 'Formula of Love',
-        image: 'https://via.placeholder.com/200x200'
-      },
-      {
-        _id: 'pc3',
-        member: 'Momo',
-        album: 'Formula of Love',
-        image: 'https://via.placeholder.com/200x200'
-      },
-      {
-        _id: 'pc5',
-        member: 'Jihyo',
-        album: 'Between 1&2',
-        image: 'https://via.placeholder.com/200x200'
-      }
-    ]
-  }) ;
-  
-  // If viewing an existing trade
+  const [tradingPartner, setTradingPartner] = useState(null);
+  const [showRatingForm, setShowRatingForm] = useState(false);
+
+  const currentUserId = user?._id || 'user1';
+  console.log('[TradeInterfacePage] Current User ID:', currentUserId, '(from user context:', user?._id, ')');
+
   useEffect(() => {
-    if (tradeId && tradeId !== 'new' && !trade) {
-      // Trade not found, redirect to trades list
-      navigate('/trades');
+    console.log('[TradeInterfacePage] useEffect triggered. tradeId:', tradeId, 'Trades available:', trades.length);
+    const currentTrade = trades.find(t => t._id === tradeId);
+    console.log('[TradeInterfacePage] Found trade in context:', currentTrade);
+
+    if (currentTrade) {
+      setTrade(currentTrade);
+      console.log('[TradeInterfacePage] Set trade state:', currentTrade);
+
+      let partnerInTrade = null;
+      if (currentTrade.initiatorId === currentUserId) {
+        partnerInTrade = currentTrade.partner?._id === currentTrade.receiverId ? currentTrade.partner : null;
+        if (!partnerInTrade && currentTrade.receiverId) {
+            console.warn("[TradeInterfacePage] Partner object might not be correctly assigned for initiator.");
+            if (currentTrade.partner?._id === currentTrade.receiverId) partnerInTrade = currentTrade.partner;
+        }
+      } else if (currentTrade.receiverId === currentUserId) {
+        partnerInTrade = currentTrade.partner?._id === currentTrade.initiatorId ? currentTrade.partner : null;
+         if (!partnerInTrade && currentTrade.initiatorId) {
+            console.warn("[TradeInterfacePage] Partner object might not be correctly assigned for receiver.");
+            if (currentTrade.partner?._id === currentTrade.initiatorId) partnerInTrade = currentTrade.partner;
+        }
+      } else {
+        console.warn("[TradeInterfacePage] Current user is neither initiator nor receiver. Using trade.partner as fallback if it's not the current user.");
+        if(currentTrade.partner?._id !== currentUserId) {
+            partnerInTrade = currentTrade.partner;
+        }
+      }
+      
+      if (!partnerInTrade && currentTrade.partner && currentTrade.partner._id !== currentUserId) {
+        console.log("[TradeInterfacePage] Fallback: Setting tradingPartner to trade.partner as it's not current user.");
+        partnerInTrade = currentTrade.partner;
+      }
+
+      setTradingPartner(partnerInTrade);
+      console.log('[TradeInterfacePage] Set tradingPartner state:', partnerInTrade);
+
+    } else if (tradeId === 'new') {
+      console.log('[TradeInterfacePage] Setting up for new trade.');
+      setTradingPartner({
+        _id: 'u2',
+        username: 'MomoLover_NewTrade',
+        avatar: 'https://via.placeholder.com/40',
+        collection: [
+          { _id: 'pcX_partner_new', member: 'Momo', album: 'Example Album Partner New', image: 'https://via.placeholder.com/100', for_trade: true },
+        ],
+      }) ;
     }
-  }, [tradeId, trade, navigate]);
-  
-  // Toggle selection of user's card
-  const toggleUserCard = (card) => {
-    if (selectedUserCards.some(c => c._id === card._id)) {
-      setSelectedUserCards(selectedUserCards.filter(c => c._id !== card._id));
+  }, [tradeId, trades, currentUserId, user]);
+
+  const handleOfferCardToggle = (cardId, listType) => {
+    if (listType === 'user') {
+      setSelectedUserCards(prev =>
+        prev.includes(cardId) ? prev.filter(id => id !== cardId) : [...prev, cardId]
+      );
     } else {
-      setSelectedUserCards([...selectedUserCards, card]);
+      setSelectedPartnerCards(prev =>
+        prev.includes(cardId) ? prev.filter(id => id !== cardId) : [...prev, cardId]
+      );
     }
   };
-  
-  // Toggle selection of partner's card
-  const togglePartnerCard = (card) => {
-    if (selectedPartnerCards.some(c => c._id === card._id)) {
-      setSelectedPartnerCards(selectedPartnerCards.filter(c => c._id !== card._id));
-    } else {
-      setSelectedPartnerCards([...selectedPartnerCards, card]);
-    }
-  };
-  
-  // Create a new trade
-  const createTrade = () => {
+
+  const handleProposeTrade = () => {
     if (selectedUserCards.length === 0 || selectedPartnerCards.length === 0) {
-      alert('Please select at least one card from each side to create a trade.');
+      alert('Please select cards for both offer and receive.');
       return;
     }
-    
-    const newTrade = {
-      _id: `t${trades.length + 1}`,
-      partner: {
-        _id: tradingPartner._id,
-        username: tradingPartner.username,
-        avatar: tradingPartner.avatar
-      },
-      status: 'pending',
-      date: new Date().toISOString().split('T')[0],
-      offered_cards: selectedUserCards.map(card => ({
-        member: card.member,
-        album: card.album
-      })),
-      received_cards: selectedPartnerCards.map(card => ({
-        member: card.member,
-        album: card.album
-      }))
-    };
-    
-    setTrades([...trades, newTrade]);
-    
-    // Send a message to the trading partner
-    if (message.trim()) {
-      sendMessage(tradingPartner._id, message);
+    if (!tradingPartner) {
+        alert('Trading partner not found or not correctly identified.');
+        console.error("[TradeInterfacePage] Attempted to propose trade with no tradingPartner.");
+        return;
     }
-    
-    // Redirect to trades list
+    if (!user || !user.collection) {
+        alert('Current user data or collection not available.');
+        return;
+    }
+    const newTrade = {
+      _id: `t${trades.length + 1}${Date.now()}`,
+      partner: tradingPartner,
+      status: 'pending',
+      date: new Date().toISOString(),
+      offered_cards: user.collection.filter(card => selectedUserCards.includes(card._id))
+        .map(c => ({ photocard_id: c._id, member: c.member, album: c.album, image: c.image })),
+      received_cards: tradingPartner.collection?.filter(card => selectedPartnerCards.includes(card._id))
+        .map(c => ({ photocard_id: c._id, member: c.member, album: c.album, image: c.image })) || [],
+      messages: [{ senderId: currentUserId, content: message, timestamp: new Date().toISOString() }],
+      initiatorId: currentUserId,
+      receiverId: tradingPartner._id,
+    };
+    setTrades(prevTrades => [...prevTrades, newTrade]);
+    if (sendMessage) sendMessage(tradingPartner._id, `Trade proposed: ${message}`);
+    else console.warn("sendMessage function not available from MessageContext");
     navigate('/trades');
   };
-  
-  // Update trade status
-  const updateTradeStatus = (newStatus) => {
-    const updatedTrades = trades.map(t => {
-      if (t._id === tradeId) {
-        return { ...t, status: newStatus };
-      }
-      return t;
-    });
-    
-    setTrades(updatedTrades);
-    
-    // Redirect to trades list
-    navigate('/trades');
+
+  const handleUpdateTradeStatus = (newStatus) => {
+    if (trade) {
+      setTrades(prevTrades =>
+        prevTrades.map(t =>
+          t._id === trade._id ? { ...t, status: newStatus } : t
+        )
+      );
+      setTrade(prevTrade => ({ ...prevTrade, status: newStatus }));
+      console.log(`[TradeInterfacePage] Trade ${trade._id} status updated to ${newStatus}`);
+    }
   };
-  
-  // If creating a new trade
-  if (tradeId === 'new') {
-    return (
-      <main className="container">
-        <div className="trade-interface-header">
-          <h2 className="section-title">Create New Trade</h2>
-          <div className="trade-with">
-            <span>Trading with:</span>
-            <div className="trade-partner">
-              <img src={tradingPartner.avatar} alt={tradingPartner.username} className="user-avatar" />
-              <span className="username">{tradingPartner.username}</span>
-            </div>
-          </div>
-        </div>
-        
-        <div className="trade-interface">
-          <div className="trade-side">
-            <h3 className="side-title">Your Cards</h3>
-            <div className="card-selection">
-              {user.collection
-                .filter(card => card.for_trade)
-                .map(card => (
-                  <div 
-                    key={card._id} 
-                    className={`selection-card ${selectedUserCards.some(c => c._id === card._id) ? 'selected' : ''}`}
-                    onClick={() => toggleUserCard(card)}
-                  >
-                    <img src={card.image} alt={`${card.member} from ${card.album}`} className="card-img-small" />
-                    <div className="card-info-small">
-                      <p className="card-title-small">{card.member}</p>
-                      <p className="card-album-small">{card.album}</p>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-          
-          <div className="trade-side">
-            <h3 className="side-title">{tradingPartner.username}'s Cards</h3>
-            <div className="card-selection">
-              {tradingPartner.collection.map(card => (
-                <div 
-                  key={card._id} 
-                  className={`selection-card ${selectedPartnerCards.some(c => c._id === card._id) ? 'selected' : ''}`}
-                  onClick={() => togglePartnerCard(card)}
-                >
-                  <img src={card.image} alt={`${card.member} from ${card.album}`} className="card-img-small" />
-                  <div className="card-info-small">
-                    <p className="card-title-small">{card.member}</p>
-                    <p className="card-album-small">{card.album}</p>
-                  </div>
+
+  console.log('[TradeInterfacePage] Evaluating rating conditions. Trade object:', trade);
+  console.log('[TradeInterfacePage] Trading partner for rating:', tradingPartner);
+
+  const alreadyRated = trade && tradingPartner ? getRatingForTradeByRater(trade._id, currentUserId) : null;
+  console.log('[TradeInterfacePage] Already rated this trade by current user?', alreadyRated);
+
+  const isParticipant = trade && (trade.initiatorId === currentUserId || trade.receiverId === currentUserId);
+  console.log('[TradeInterfacePage] Is current user a participant?', isParticipant, 'Initiator:', trade?.initiatorId, 'Receiver:', trade?.receiverId);
+
+  const canRate = trade && trade.status === 'completed' && tradingPartner && tradingPartner._id !== currentUserId && !alreadyRated && isParticipant;
+  console.log('[TradeInterfacePage] Can rate?', canRate,
+              'trade status completed:', trade?.status === 'completed',
+              'tradingPartner exists:', !!tradingPartner,
+              'partner is not self:', tradingPartner?._id !== currentUserId,
+              '!alreadyRated:', !alreadyRated,
+              'isParticipant:', isParticipant);
+
+  if (tradeId !== 'new' && !trade && trades.length > 0) {
+    console.log("[TradeInterfacePage] No specific trade found for ID:", tradeId, "and not creating new. Showing loading/not found.");
+    return <main className="container"><p>Loading trade details or trade not found...</p></main>;
+  }
+  if (tradeId === 'new' && (!user || !user.collection)) {
+    return <main className="container"><p>Please log in and ensure your collection is loaded to propose a new trade.</p></main>;
+  }
+
+  return (
+    <main className="container trade-interface-page">
+      {tradeId === 'new' ? (
+        <h2>Propose New Trade with {tradingPartner?.username || 'User'}</h2>
+      ) : (
+        <h2>Trade with {tradingPartner?.username || trade?.partner.username}</h2>
+      )}
+
+      {trade && tradeId !== 'new' && (
+        <div className="trade-details-section">
+          <p><strong>Status:</strong> <span className={`status-${trade.status}`}>{trade.status.replace('-', ' ')}</span></p>
+          <p><strong>Date:</strong> {new Date(trade.date).toLocaleDateString()}</p>
+          <div className="trade-cards-comparison">
+            <div>
+              <h4>You Offered:</h4>
+              {trade.offered_cards?.map((card, index) => (
+                <div key={`offered-${index}-${card.photocard_id}`} className="mini-card-display">
+                  <img src={card.image} alt={`${card.member} - ${card.album}`} />
+                  <p>{card.member} - {card.album}</p>
                 </div>
-              ))}
+              )) || <p>No cards offered.</p>}
+            </div>
+            <div>
+              <h4>You Will Receive:</h4>
+              {trade.received_cards?.map((card, index) => (
+                <div key={`received-${index}-${card.photocard_id}`} className="mini-card-display">
+                  <img src={card.image} alt={`${card.member} - ${card.album}`} />
+                  <p>{card.member} - {card.album}</p>
+                </div>
+              )) || <p>No cards to receive.</p>}
             </div>
           </div>
+
+          <div className="trade-actions">
+            {trade.status === 'pending' && trade.receiverId === currentUserId && (
+              <button onClick={() => handleUpdateTradeStatus('accepted')} className="btn btn-success">Accept Trade</button>
+            )}
+            {trade.status === 'pending' && (trade.initiatorId === currentUserId || trade.receiverId === currentUserId) && (
+              <button onClick={() => handleUpdateTradeStatus('declined')} className="btn btn-danger">Decline Trade</button>
+            )}
+            {trade.status === 'accepted' && (trade.initiatorId === currentUserId || trade.receiverId === currentUserId) && (
+              <button onClick={() => handleUpdateTradeStatus('shipped')} className="btn btn-primary">Mark as Shipped/Received</button>
+            )}
+            {trade.status === 'shipped' && (trade.initiatorId === currentUserId || trade.receiverId === currentUserId) && (
+              <button onClick={() => handleUpdateTradeStatus('completed')} className="btn btn-primary">Mark as Completed</button>
+            )}
+            
+            {canRate && tradingPartner && (
+              <button onClick={() => setShowRatingForm(true)} className="btn btn-info">Rate {tradingPartner.username}</button>
+            )}
+          </div>
+
+          {showRatingForm && trade && tradingPartner && (
+            <div className="rating-form-container" style={{ marginTop: '20px', border: '1px solid #eee', padding: '20px', borderRadius: '8px' }}>
+              <RatingForm 
+                tradeId={trade._id}
+                ratedUserId={tradingPartner._id}
+                onComplete={() => {
+                  setShowRatingForm(false);
+                }}
+              />
+              <button onClick={() => setShowRatingForm(false)} className="btn btn-secondary" style={{ marginTop: '10px' }}>Cancel Rating</button>
+            </div>
+          )}
+          
+          {alreadyRated && trade.status === 'completed' && (
+            <p className="feedback-info" style={{ marginTop: '15px', color: 'green' }}>You have already rated this trade. Thank you!</p>
+          )}
         </div>
-        
-        <div className="trade-message">
-          <h3>Message to {tradingPartner.username}</h3>
-          <textarea
+      )}
+
+      {tradeId === 'new' && tradingPartner && user && user.collection && (
+        <div className="new-trade-form">
+          <h3>Your Offer (from your collection):</h3>
+          <div className="card-selection-grid">
+            {user.collection.filter(c => c.for_trade).map(card => (
+              <div 
+                key={card._id} 
+                className={`card-selectable ${selectedUserCards.includes(card._id) ? 'selected' : ''}`}
+                onClick={() => handleOfferCardToggle(card._id, 'user')}
+              >
+                <img src={card.image} alt={`${card.member} - ${card.album}`} />
+                <p>{card.member} - {card.album}</p>
+              </div>
+            ))}
+             {user.collection.filter(c => c.for_trade).length === 0 && <p>You have no cards marked for trade in your collection.</p>}
+          </div>
+
+          <h3>Request from {tradingPartner.username}'s Collection:</h3>
+          <div className="card-selection-grid">
+            {tradingPartner.collection && tradingPartner.collection.filter(c => c.for_trade).map(card => (
+              <div 
+                key={card._id} 
+                className={`card-selectable ${selectedPartnerCards.includes(card._id) ? 'selected' : ''}`}
+                onClick={() => handleOfferCardToggle(card._id, 'partner')}
+              >
+                <img src={card.image} alt={`${card.member} - ${card.album}`} />
+                <p>{card.member} - {card.album}</p>
+              </div>
+            ))}
+            {(!tradingPartner.collection || tradingPartner.collection.filter(c => c.for_trade).length === 0) && <p>{tradingPartner.username} has no cards marked for trade.</p>}
+          </div>
+
+          <textarea 
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder={`Write a message to ${tradingPartner.username}...`}
+            placeholder="Add a message to your trade proposal (optional)"
+            rows="3"
             className="trade-message-input"
-          ></textarea>
+            style={{ width: '100%', padding: '10px', marginTop: '15px', borderRadius: '4px', border: '1px solid #ccc' }}
+          />
+          <button onClick={handleProposeTrade} className="btn btn-primary" style={{ marginTop: '15px' }}>Propose Trade</button>
         </div>
-        
-        <div className="trade-actions">
-          <button className="btn btn-secondary" onClick={() => navigate('/trades')}>
-            Cancel
-          </button>
-          <button className="btn btn-primary" onClick={createTrade}>
-            Propose Trade
-          </button>
-        </div>
-      </main>
-    );
-  }
-  
-  // If viewing an existing trade
-  if (trade) {
-    return (
-      <main className="container">
-        <div className="trade-interface-header">
-          <h2 className="section-title">Trade Details</h2>
-          <div className="trade-with">
-            <span>Trading with:</span>
-            <div className="trade-partner">
-              <img src={trade.partner.avatar} alt={trade.partner.username} className="user-avatar" />
-              <span className="username">{trade.partner.username}</span>
-            </div>
-          </div>
-          <span className={`status-badge status-${trade.status}`}>
-            {trade.status === 'in-progress' ? 'In Progress' : 
-             trade.status.charAt(0).toUpperCase() + trade.status.slice(1)}
-          </span>
-        </div>
-        
-        <div className="trade-interface">
-          <div className="trade-side">
-            <h3 className="side-title">You Offered</h3>
-            <div className="trade-cards-list">
-              {trade.offered_cards.map((card, index) => (
-                <div key={index} className="trade-card-detail">
-                  <div className="card-info">
-                    <p className="card-member">{card.member}</p>
-                    <p className="card-album">{card.album}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          
-          <div className="trade-side">
-            <h3 className="side-title">You Received</h3>
-            <div className="trade-cards-list">
-              {trade.received_cards.map((card, index) => (
-                <div key={index} className="trade-card-detail">
-                  <div className="card-info">
-                    <p className="card-member">{card.member}</p>
-                    <p className="card-album">{card.album}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-        
-        <div className="trade-date-info">
-          <p>Trade initiated on: {new Date(trade.date).toLocaleDateString()}</p>
-        </div>
-        
-        {trade.status === 'pending' && (
-          <div className="trade-actions">
-            <button className="btn btn-secondary" onClick={() => updateTradeStatus('cancelled')}>
-              Decline
-            </button>
-            <button className="btn btn-primary" onClick={() => updateTradeStatus('in-progress')}>
-              Accept
-            </button>
-          </div>
-        )}
-        
-        {trade.status === 'in-progress' && (
-          <div className="trade-actions">
-            <button className="btn btn-secondary" onClick={() => updateTradeStatus('cancelled')}>
-              Cancel
-            </button>
-            <button className="btn btn-primary" onClick={() => updateTradeStatus('completed')}>
-              Complete Trade
-            </button>
-          </div>
-        )}
-        
-        <div className="back-link">
-          <Link to="/trades">← Back to Trades</Link>
-        </div>
-      </main>
-    );
-  }
-  
-  return <div>Loading...</div>;
+      )}
+
+      <div className="back-link" style={{ marginTop: '20px' }}>
+        <Link to="/trades">← Back to Trades List</Link>
+      </div>
+    </main>
+  );
 };
 
 export default TradeInterfacePage;
