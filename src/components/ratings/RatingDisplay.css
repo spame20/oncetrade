@@ -1,66 +1,66 @@
-.ratings-list {
-    margin-top: 30px;
-  }
-  
-  .ratings-list h3 {
+.ratings-list h3 {
+    margin-top: 20px;
     margin-bottom: 15px;
-    color: #333;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 10px;
+    font-size: 1.5em;
+    font-family: var(--font-primary);
+    color: var(--color-text-headings);
   }
   
   .rating-item {
-    background-color: #f9f9f9;
-    border: 1px solid var(--border);
-    border-radius: 5px;
+    border: 1px solid var(--color-border);
     padding: 15px;
     margin-bottom: 15px;
+    border-radius: 8px; /* Consistent with other cards */
+    background-color: var(--color-background-card);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   }
   
   .rating-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
-    flex-wrap: wrap; /* Allow wrapping for smaller screens */
+    flex-wrap: wrap; /* Allow wrapping on small screens */
   }
   
   .rating-stars {
-    margin-right: 10px;
+    margin-right: 10px; /* Space between stars and user/date */
   }
   
   .rating-stars .star {
-    font-size: 1.2rem;
-    color: #ccc;
+    color: #ccc; /* Default unselected star color */
+    font-size: 1.2em;
+    cursor: default;
   }
   
   .rating-stars .star.selected {
-    color: #ffc107;
+    color: var(--color-accent); /* Use accent color for selected stars */
   }
   
-  .rating-user {
-    font-size: 0.9rem;
-    color: #555;
-    margin-right: 10px;
-  }
-  
+  .rating-user,
   .rating-date {
-    font-size: 0.8rem;
-    color: #777;
-    margin-left: auto; /* Pushes date to the right */
+    font-size: 0.9em;
+    color: var(--color-text-primary);
+    opacity: 0.8;
+    font-family: var(--font-secondary);
   }
   
   .rating-comment-display {
-    font-size: 0.95rem;
-    color: #333;
+    font-size: 1em;
     line-height: 1.5;
-    margin-top: 5px;
-    white-space: pre-wrap; /* Preserves whitespace and newlines in comments */
+    color: var(--color-text-primary);
+    font-family: var(--font-secondary);
   }
   
   .no-ratings {
     text-align: center;
-    color: #777;
+    color: var(--color-text-primary);
+    opacity: 0.7;
     padding: 20px;
     font-style: italic;
+    font-family: var(--font-secondary);
+    background-color: var(--color-background-card);
+    border-radius: 8px;
+    margin-top: 20px;
   }
   

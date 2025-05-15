@@ -2158,3 +2158,116 @@ header {
   /* If you added 2px padding above, you might want to adjust image or container dimensions slightly */
   /* For now, let's see how it looks without adjustments here */
 }
+/* Photocard Hover Animation */
+.photocard {
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+  /* Ensure other base styles for .photocard are not overridden 
+     or are compatible. This assumes .photocard is your main class 
+     for individual card containers. */
+}
+
+.photocard:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  z-index: 10; /* Optional: to ensure the hovered card appears above others if they are closely packed */
+}
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Raleway:wght@400;500;700&display=swap') ;
+
+/* Define CSS Variables for colors and fonts (optional but recommended) */
+:root {
+  --font-primary: 'Playfair Display', serif;
+  --font-secondary: 'Raleway', sans-serif;
+
+  --color-text-primary: #3a3a3a; /* Dark grey for body text */
+  --color-text-headings: #5c5470; /* Muted purple for headings */
+  --color-accent: #b392ac; /* Elegant rose for accents/links */
+  --color-background-main: #fdfcf7; /* Soft off-white for main background */
+  --color-background-card: #ffffff; /* White for cards */
+  --color-border: #e0e0e0; /* Light grey for borders */
+
+  /* TWICE Accent Colors (use sparingly) */
+  --color-twice-apricot: #ffdab9; /* Example Apricot - adjust as needed */
+  --color-twice-magenta: #ff00ff; /* Example Neon Magenta - adjust as needed */
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-secondary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-background-main);
+  color: var(--color-text-primary);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-primary);
+  color: var(--color-text-headings);
+  margin-top: 0;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+/* Add more global styles as needed */
+/* ... (other global styles) ... */
+
+.subtle-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--color-border), transparent);
+  margin: 30px 0;
+  position: relative;
+  border: none;
+}
+
+/* Optional: Heartbeat/Graph inspired element on the divider */
+.subtle-divider::before {
+  content: "+ <3 ="; /* Placeholder for O+T=<3 inspired, can be an SVG later */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--color-background-main);
+  padding: 0 10px;
+  font-family: var(--font-secondary);
+  font-size: 0.8em;
+  color: var(--color-accent);
+  opacity: 0.7;
+}
+
+/* Simpler version without text, just a line */
+.subtle-divider-simple {
+  height: 1px;
+  background-color: var(--color-border);
+  margin: 30px 0;
+  border: none;
+  opacity: 0.5;
+}
+/* In a component-specific CSS or global CSS */
+.custom-list-style {
+  list-style: none;
+  padding-left: 0;
+}
+.custom-list-style li::before {
+  content: "+"; /* Or "=" or a small heart SVG */
+  color: var(--color-accent);
+  font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em; /* Adjust as needed */
+  margin-right: 0.5em;
+}

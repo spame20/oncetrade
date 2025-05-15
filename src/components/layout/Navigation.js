@@ -1,48 +1,59 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext'; // Make sure this path is correct
+import './Navigation.css';
 
-const Navigation = () => {
-  const location = useLocation();
-  
-  // Check if the current path matches the link
-  const isActive = (path) => {
-    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+const Navigation = ({ isMobileNavVisible, toggleMobileNav }) => {
+  const { isAuthenticated } = useAuth();
+
+  // Log the received prop to see if it changes
+  console.log('Navigation.js: Received isMobileNavVisible prop with value:', isMobileNavVisible);
+
+  const handleLinkClick = () => {
+    if (isMobileNavVisible && typeof toggleMobileNav === 'function') {
+      console.log('Navigation.js: Link clicked, calling toggleMobileNav to close menu.');
+      toggleMobileNav();
+    }
   };
 
   return (
-    <nav className="main-nav">
+    <nav className={`main-navigation ${isMobileNavVisible ? 'mobile-nav-active' : ''}`}>
       <div className="container">
         <ul className="nav-links">
           <li>
-            <Link to="/" className={isActive('/') ? 'active' : ''}>
+            <NavLink to="/" className={({ isActive }) => isActive ? 'active' : ''} onClick={handleLinkClick} end>
               Home
-            </Link>
+            </NavLink>
           </li>
           <li>
-            <Link to="/albums" className={isActive('/albums') ? 'active' : ''}>
+            <NavLink to="/albums" className={({ isActive }) => isActive ? 'active' : ''} onClick={handleLinkClick}>
               Albums
-            </Link>
+            </NavLink>
           </li>
-          <li>
-            <Link to="/profile" className={isActive('/profile') ? 'active' : ''}>
-              Collection
-            </Link>
-          </li>
-          <li>
-            <Link to="/wishlist" className={isActive('/wishlist') ? 'active' : ''}>
-              Wishlist
-            </Link>
-          </li>
-          <li>
-            <Link to="/trades" className={isActive('/trades') ? 'active' : ''}>
-              Trades
-            </Link>
-          </li>
-          <li>
-            <Link to="/messages" className={isActive('/messages') ? 'active' : ''}>
-              Messages
-            </Link>
-          </li>
+          {isAuthenticated && (
+            <>
+              <li>
+                <NavLink to="/my-collection" className={({ isActive }) => isActive ? 'active' : ''} onClick={handleLinkClick}>
+                  My Collection
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/wishlist" className={({ isActive }) => isActive ? 'active' : ''} onClick={handleLinkClick}>
+                  Wishlist
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/trades" className={({ isActive }) => isActive ? 'active' : ''} onClick={handleLinkClick}>
+                  Trades
+                </NavLink>
+              </li>
+              <li>
+                <NavLink to="/messages" className={({ isActive }) => isActive ? 'active' : ''} onClick={handleLinkClick}>
+                  Messages
+                </NavLink>
+              </li>
+            </>
+          )}
         </ul>
       </div>
     </nav>

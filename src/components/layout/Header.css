@@ -1,0 +1,202 @@
+/* General Header Styles */
+header {
+    background-color: var(--color-background-main);
+    padding: 15px 0;
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px; /* Or your preferred max-width */
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  
+  .logo a {
+    font-family: var(--font-primary);
+    font-size: 1.8em;
+    font-weight: 700;
+    color: var(--color-text-headings);
+    text-decoration: none;
+  }
+  
+  /* Desktop Navigation */
+  .main-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+  }
+  
+  .main-nav li {
+    margin-left: 25px;
+  }
+  
+  .main-nav a {
+    font-family: var(--font-secondary);
+    font-size: 1em;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  
+  .main-nav a:hover,
+  .main-nav a.active {
+    color: var(--color-accent);
+  }
+  
+  /* Search Bar */
+  .search-bar {
+    flex-grow: 0.5;
+    margin: 0 20px;
+  }
+  
+  .search-bar input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid var(--color-border);
+    border-radius: 20px;
+    font-family: var(--font-secondary);
+    font-size: 0.9em;
+    outline: none;
+  }
+  
+  .search-bar input::placeholder {
+    color: #aaa;
+  }
+  
+  /* User Menu (Desktop) */
+  .user-menu {
+    display: flex; /* Ensure items are in a row */
+    align-items: center;
+  }
+  
+  .user-menu .btn-primary,
+  .user-menu .btn-secondary,
+  .user-menu button.btn-secondary { /* For the logout button */
+    font-family: var(--font-secondary);
+    margin-left: 15px;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .user-menu .btn-primary {
+    background-color: var(--color-accent);
+    color: white;
+    border: 1px solid var(--color-accent);
+  }
+  
+  .user-menu .btn-primary:hover {
+    background-color: #a3829c; /* Darker shade of accent */
+    border-color: #a3829c;
+  }
+  
+  .user-menu .btn-secondary {
+    background-color: transparent;
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+  }
+  
+  .user-menu .btn-secondary:hover {
+    background-color: var(--color-accent);
+    color: white;
+  }
+  
+  /* Hamburger Menu Icon */
+  .hamburger-menu {
+    display: none; /* Hidden by default */
+    font-size: 1.8em; /* Make it a bit larger for touch */
+    color: var(--color-text-primary); /* Ensure it has a color */
+    cursor: pointer;
+    padding: 5px; /* Add some padding for easier clicking */
+  }
+  
+  /* Mobile Navigation Menu (Dropdown) */
+  .mobile-nav-menu {
+    display: none; /* Hidden by default, shown by JS adding .active class */
+    position: absolute;
+    top: 100%; /* Position below the header */
+    left: 0;
+    right: 0;
+    background-color: var(--color-background-main);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 999;
+    border-top: 1px solid var(--color-border-subtle, var(--color-border)); /* Fallback to --color-border */
+  }
+  
+  .mobile-nav-menu.active {
+    display: block;
+  }
+  
+  .mobile-nav-menu ul {
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .mobile-nav-menu li {
+    margin: 0;
+  }
+  
+  .mobile-nav-menu a,
+  .mobile-nav-menu button { /* Style links and buttons consistently */
+    display: block;
+    padding: 15px 20px;
+    font-family: var(--font-secondary);
+    font-size: 1.1em;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-border-subtle, var(--color-border));
+    transition: background-color 0.2s ease, color 0.2s ease;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border-left: none;
+    border-right: none;
+    cursor: pointer;
+  }
+  
+  .mobile-nav-menu li:last-child a,
+  .mobile-nav-menu li:last-child button {
+    border-bottom: none;
+  }
+  
+  .mobile-nav-menu a:hover,
+  .mobile-nav-menu a.active,
+  .mobile-nav-menu button:hover {
+    background-color: var(--color-background-hover, #f0f0f0); /* Fallback hover color */
+    color: var(--color-accent);
+  }
+  
+  /* Responsive: Mobile View */
+  @media (max-width: 768px) {
+    .main-nav,
+    .search-bar,
+    .user-menu { /* Hide desktop user menu items */
+      display: none;
+    }
+  
+    .hamburger-menu {
+      display: flex; /* Use flex to better align the icon if needed */
+      align-items: center;
+    }
+  
+    .header-content {
+      padding: 0 15px; /* Adjust padding for smaller screens */
+      /* justify-content: space-between; is inherited, ensures logo and hamburger are spaced */
+    }
+  }
+  

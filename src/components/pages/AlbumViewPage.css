@@ -1,0 +1,88 @@
+.album-view-page-main { /* Specific class for the main container */
+    padding-top: 20px;
+    padding-bottom: 40px;
+  }
+  
+  .album-header-info {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: var(--color-background-card);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  .album-view-title {
+    font-family: var(--font-primary);
+    font-size: 2.2em;
+    color: var(--color-text-headings);
+    margin-bottom: 8px;
+  }
+  
+  .album-view-details {
+    font-family: var(--font-secondary);
+    font-size: 1em;
+    color: var(--color-text-primary);
+    margin-bottom: 5px;
+  }
+  
+  .photocard-controls { /* For future filters/sorts within album view */
+    display: flex;
+    justify-content: flex-end; /* Align to the right, or center/space-between */
+    align-items: center;
+    margin-bottom: 25px;
+    /* Add styling for filter/sort controls here if needed later */
+  }
+  
+  .photocard-grid {
+    display: grid;
+    /* Aim for 5 columns on wider screens */
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+    gap: 20px; /* Spacing between photocards */
+  }
+  
+  /* Responsive adjustments for photocard grid */
+  @media (min-width: 1200px) { /* Larger desktops */
+    .photocard-grid {
+      grid-template-columns: repeat(5, 1fr); /* Exactly 5 columns */
+    }
+  }
+  
+  @media (max-width: 992px) { /* Medium devices */
+    .photocard-grid {
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 15px;
+    }
+  }
+  
+  @media (max-width: 768px) { /* Small devices */
+    .photocard-grid {
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 15px;
+    }
+    .album-view-title {
+      font-size: 1.8em;
+    }
+  }
+  
+  @media (max-width: 480px) { /* Extra small devices */
+    .photocard-grid {
+      /* Adjust to 2 or 3 columns based on desired card size */
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
+      gap: 10px;
+    }
+  }
+  
+  /* Loading/Error/No Photocard States */
+  .album-view-message {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 1.1em;
+    font-family: var(--font-secondary);
+  }
+  
+  .album-view-message.error {
+    color: red;
+  }
+  
+  

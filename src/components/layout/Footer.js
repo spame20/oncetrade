@@ -1,14 +1,22 @@
 import React from 'react';
+import './Footer.css'; // We will create this CSS file next
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer>
-      <div className="container">
-        <p>&copy; 2025 TWICE Photo Card Exchange. All rights reserved.</p>
-        <p>This is a fan-made platform. TWICE and all related content are trademarks and copyrights of JYP Entertainment and their respective owners.</p>
+    <footer className="site-footer">
+      <div className="container footer-content">
+        <p>&copy; {currentYear} ONCEtrade. All rights reserved (Fan Project).</p>
+        <p>
+          <a href="/privacy-policy">Privacy Policy</a> | <a href="/terms-of-service">Terms of Service</a>
+          {/* Add other footer links as needed */}
+        </p>
+        {/* You can add social media icons or other elements here later */}
       </div>
     </footer>
   );
 };
 
 export default Footer;
+

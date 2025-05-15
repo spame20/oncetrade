@@ -1,0 +1,114 @@
+/* Main Navigation Bar Styles (for Navigation.js) */
+.main-navigation {
+    background-color: var(--color-background-light, #f8f9fa); /* A slightly different background from header, or a border */
+    border-bottom: 1px solid var(--color-border);
+    padding: 10px 0;
+    width: 100%; /* Ensure it spans the full width */
+    /* This will be hidden and shown by Layout.js on mobile */
+  }
+  
+  .main-navigation .container {
+    max-width: 1200px; /* Match your site's max-width */
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  
+  .main-navigation .nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: center; /* Center links by default on desktop */
+    align-items: center;
+  }
+  
+  .main-navigation .nav-links li {
+    margin: 0 15px; /* Spacing between links */
+  }
+  
+  .main-navigation .nav-links a {
+    font-family: var(--font-secondary);
+    font-size: 1em; /* Adjust as needed */
+    font-weight: 500;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    padding: 8px 0; /* Add some vertical padding for a larger click area */
+    position: relative;
+    transition: color 0.3s ease;
+  }
+  
+  .main-navigation .nav-links a:hover,
+  .main-navigation .nav-links a.active {
+    color: var(--color-accent);
+  }
+  
+  /* Style for the active link (underline) */
+  .main-navigation .nav-links a.active::after {
+    content: "";
+    position: absolute;
+    bottom: -2px; /* Position the underline slightly below the text */
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--color-accent);
+  }
+  
+  /* Mobile Navigation Styles for main-navigation */
+  /* The .mobile-nav-active class will be added to .main-navigation by Layout.js */
+  @media (max-width: 768px) {
+    .main-navigation {
+      display: none; /* Hidden by default on mobile, shown by .mobile-nav-active */
+      /* When active, it will be displayed as block by .mobile-nav-active */
+      position: absolute; 
+      top: 60px; /* Adjust based on your top header's height. Ensure this value is correct. */
+      left: 0;
+      right: 0;
+      background-color: var(--color-background-main); 
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      z-index: 998; /* Below top header (e.g., 1000) but above page content */
+      padding: 0; 
+      border-top: 1px solid var(--color-border-subtle, var(--color-border));
+    }
+  
+    .main-navigation.mobile-nav-active {
+      display: block; /* Show when active */
+    }
+  
+    .main-navigation .container {
+      padding: 0; /* Remove container padding for full-width list items on mobile */
+    }
+  
+    .main-navigation .nav-links {
+      flex-direction: column; /* Stack links vertically */
+      align-items: stretch; /* Make links take full width */
+    }
+  
+    .main-navigation .nav-links li {
+      margin: 0;
+      width: 100%;
+    }
+  
+    .main-navigation .nav-links a {
+      display: block; /* Make links block-level */
+      padding: 15px 20px; /* Generous padding for touch targets */
+      border-bottom: 1px solid var(--color-border-subtle, var(--color-border));
+      text-align: left;
+    }
+  
+    .main-navigation .nav-links li:last-child a {
+      border-bottom: none;
+    }
+  
+    /* Hide desktop-style active link underline on mobile if it looks cluttered */
+    .main-navigation .nav-links a.active::after {
+      display: none; 
+    }
+  
+    /* Hover/active state for mobile links */
+    .main-navigation .nav-links a:hover,
+    .main-navigation .nav-links a.active {
+      background-color: var(--color-background-hover, #f0f0f0);
+      color: var(--color-accent); /* Ensure accent color is defined */
+    }
+  }
+  

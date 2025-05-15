@@ -1,0 +1,85 @@
+.albums-list-page-main { /* Use a specific class for the main container */
+    padding-top: 20px;
+    padding-bottom: 40px;
+  }
+  
+  .section-title {
+    font-family: var(--font-primary);
+    font-size: 2.5em;
+    color: var(--color-text-headings);
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .albums-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: var(--color-background-card);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  .search-box .album-search,
+  .sort-box .sort-select {
+    padding: 10px 15px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    font-family: var(--font-secondary);
+    font-size: 1em;
+    outline: none;
+  }
+  
+  .search-box .album-search {
+    min-width: 250px; /* Ensure search box has decent width */
+  }
+  
+  .sort-box label {
+    margin-right: 10px;
+    font-family: var(--font-secondary);
+    font-weight: 500;
+  }
+  
+  .album-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsive grid */
+    gap: 25px; /* Spacing between album cards */
+  }
+  
+  /* Responsive adjustments for controls */
+  @media (max-width: 768px) {
+    .albums-controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .search-box,
+    .sort-box {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    .sort-box {
+      margin-bottom: 0;
+    }
+    .search-box .album-search,
+    .sort-box .sort-select {
+      width: 100%;
+      box-sizing: border-box; /* Ensure padding doesn't break width */
+    }
+    .album-grid {
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .album-grid {
+      grid-template-columns: 1fr; /* Single column on very small screens */
+      gap: 15px;
+    }
+    .section-title {
+      font-size: 2em;
+    }
+  }
+  

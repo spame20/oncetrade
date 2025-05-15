@@ -1,0 +1,27 @@
+.site-footer {
+    background-color: var(--color-text-headings); /* Using the muted purple for contrast */
+    color: var(--color-background-main); /* Light text on dark background */
+    padding: 30px 0;
+    margin-top: 40px; /* Space above the footer */
+    font-family: var(--font-secondary);
+    font-size: 0.9em;
+    text-align: center;
+  }
+  
+  .footer-content p {
+    margin-bottom: 8px;
+  }
+  
+  .footer-content a {
+    color: var(--color-background-main); /* Light links */
+    text-decoration: none;
+    margin: 0 8px;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+  }
+  
+  .footer-content a:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
+  
