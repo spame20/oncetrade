@@ -58,9 +58,9 @@
   @media (max-width: 768px) {
     .main-navigation {
       display: none; /* Hidden by default on mobile, shown by .mobile-nav-active */
-      /* When active, it will be displayed as block by .mobile-nav-active */
       position: absolute; 
-      top: 60px; /* Adjust based on your top header's height. Ensure this value is correct. */
+      top: 60px; /* Adjust this value based on your actual top header's height. */
+                 /* It needs to be precise to appear directly below the header. */
       left: 0;
       right: 0;
       background-color: var(--color-background-main); 
@@ -111,4 +111,3 @@
       color: var(--color-accent); /* Ensure accent color is defined */
     }
   }
-  

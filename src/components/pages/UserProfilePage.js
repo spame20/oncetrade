@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useUser } from '../../context/UserContext'; // Provides current logged-in user
+import { useUser } from '../../context/UserContext'; 
 import { useRatings } from '../../context/RatingContext';
 import { useTrades } from '../../context/TradeContext';
+import PhotoCard from '../common/PhotoCard'; // Import the PhotoCard component
 
 // Mock data for users - replace with actual data fetching in a real app
 const mockUsers = [
@@ -12,11 +13,11 @@ const mockUsers = [
     avatar: 'https://via.placeholder.com/150',
     join_date: '2025-01-15',
     collection: [
-      { _id: 'pc1', photocard_id: 'pc1', member: 'Nayeon', album: 'Formula of Love', image: 'https://via.placeholder.com/100', for_trade: true },
-      { _id: 'pc2', photocard_id: 'pc2', member: 'Jeongyeon', album: 'Formula of Love', image: 'https://via.placeholder.com/100', for_trade: false },
+      { _id: 'userCard1', photocard_id: 'pc1', member: 'Nayeon', album: 'Formula of Love', image: 'https://via.placeholder.com/200x250?text=Nayeon+FOL', for_trade: true, quantity: 1 },
+      { _id: 'userCard2', photocard_id: 'pc2', member: 'Jeongyeon', album: 'Formula of Love', image: 'https://via.placeholder.com/200x250?text=Jeongyeon+FOL', for_trade: false, quantity: 2 },
     ],
     wishlist: [
-      { _id: 'w1', photocard_id: 'pc3', member: 'Momo', album: 'Formula of Love', image: 'https://via.placeholder.com/100', available_trades: 2 },
+      { _id: 'wishItem1', photocard_id: 'pc3', member: 'Momo', album: 'Formula of Love', image: 'https://via.placeholder.com/200x250?text=Momo+FOL' },
     ],
   },
   {
@@ -42,9 +43,9 @@ const mockUsers = [
   },
 ];
 
-const UserProfilePage = ()   => {
-  const { userId } = useParams(); // Get userId from URL params (e.g., /profile/u2)
-  const { user: loggedInUser, toggleForTrade } = useUser(); // Get the currently logged-in user and collection functions
+const UserProfilePage = ( ) => {
+  const { userId } = useParams();
+  const { user: loggedInUser } = useUser();
   const { trades } = useTrades();
   const { getRatingsForUser } = useRatings();
 
@@ -53,35 +54,24 @@ const UserProfilePage = ()   => {
   const [userRatings, setUserRatings] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [userCardStatuses, setUserCardStatuses] = useState({}); // For PhotoCard interactions
 
   useEffect(() => {
     setIsLoading(true);
     let userToDisplay = null;
+    let currentMockUser = null;
 
     if (userId) {
-      // Viewing a specific user's profile via URL (e.g., /profile/u2)
-      console.log(`[UserProfilePage] Attempting to display profile for userId from URL: ${userId}`);
-      userToDisplay = mockUsers.find(u => u._id === userId);
-      if (!userToDisplay) {
-        console.warn(`[UserProfilePage] User with ID ${userId} not found in mockUsers.`);
-      }
+      currentMockUser = mockUsers.find(u => u._id === userId);
+      userToDisplay = currentMockUser;
     } else if (loggedInUser && loggedInUser._id) {
-      // No userId in URL, so display the logged-in user's profile
-      // This is typically for routes like /profile or when clicking "My Collection"
-      console.log(`[UserProfilePage] No userId in URL. Displaying logged-in user: ${loggedInUser.username} (ID: ${loggedInUser._id})`);
-      userToDisplay = mockUsers.find(u => u._id === loggedInUser._id);
-      if (!userToDisplay) {
-         console.warn(`[UserProfilePage] Logged-in user (ID: ${loggedInUser._id}) from context not found in mockUsers. Using context user directly.`);
-         userToDisplay = loggedInUser; 
-      }
-    } else {
-      console.log("[UserProfilePage] No userId in URL and no loggedInUser in context.");
-    }
+      currentMockUser = mockUsers.find(u => u._id === loggedInUser._id);
+      userToDisplay = currentMockUser || loggedInUser; // Fallback to context user if not in mock
+    } 
 
     setProfileUser(userToDisplay);
 
     if (userToDisplay && userToDisplay._id) {
-      console.log(`[UserProfilePage] Profile user set to: ${userToDisplay.username}. Fetching ratings.`);
       const ratings = getRatingsForUser(userToDisplay._id);
       setUserRatings(ratings);
       if (ratings.length > 0) {
@@ -90,10 +80,35 @@ const UserProfilePage = ()   => {
       } else {
         setAverageRating(0);
       }
+
+      // Initialize userCardStatuses from the profileUser's collection and wishlist
+      const initialStatuses = {};
+      if (userToDisplay.collection) {
+        userToDisplay.collection.forEach(item => {
+          initialStatuses[item.photocard_id] = {
+            status: 'owned',
+            quantity: item.quantity || 1, // Assuming quantity might be in your data
+            forTrade: item.for_trade || false,
+          };
+        });
+      }
+      if (userToDisplay.wishlist) {
+        userToDisplay.wishlist.forEach(item => {
+          // Avoid overwriting if a card is somehow in collection AND wishlist (owned takes precedence)
+          if (!initialStatuses[item.photocard_id]) {
+            initialStatuses[item.photocard_id] = {
+              status: 'wanted',
+              quantity: 0,
+              forTrade: false,
+            };
+          }
+        });
+      }
+      setUserCardStatuses(initialStatuses);
     } else {
-      console.log("[UserProfilePage] No profileUser to display or fetch ratings for.");
       setUserRatings([]);
       setAverageRating(0);
+      setUserCardStatuses({});
     }
     setIsLoading(false);
   }, [userId, loggedInUser, getRatingsForUser]);
@@ -104,6 +119,29 @@ const UserProfilePage = ()   => {
     trade.initiatorId === profileUser._id || trade.receiverId === profileUser._id
   ) : [];
 
+  const handleCardStatusChange = useCallback((cardId, newStatusInfo) => {
+    if (!isOwnProfile) {
+      console.log("Cannot change status on another user's profile.");
+      return;
+    }
+    console.log('[UserProfilePage] Updating status for card:', cardId, 'New status info:', newStatusInfo);
+    setUserCardStatuses(prevStatuses => {
+      const updatedStatuses = { ...prevStatuses };
+      if (newStatusInfo === null) { 
+        delete updatedStatuses[cardId];
+      } else {
+        updatedStatuses[cardId] = { 
+          ...prevStatuses[cardId],
+          ...newStatusInfo 
+        };
+      }
+      // TODO: API call to persist this change to the backend for the loggedInUser
+      // e.g., updateUserCollection(loggedInUser._id, cardId, updatedStatuses[cardId]);
+      console.log("[UserProfilePage] New statuses:", updatedStatuses);
+      return updatedStatuses;
+    });
+  }, [isOwnProfile]);
+
   if (isLoading) {
     return <main className="container"><p>Loading profile...</p></main>;
   }
@@ -112,42 +150,28 @@ const UserProfilePage = ()   => {
     return <main className="container"><p>User not found.</p></main>;
   }
 
-  const handleToggleForTrade = (cardId) => {
-    if (isOwnProfile) {
-      toggleForTrade(cardId);
-    } else {
-      console.log("[UserProfilePage] Cannot toggle trade status on another user's profile.");
-    }
-  };
-
   const renderCollection = () => (
     <div className="profile-collection">
       <h4>{isOwnProfile ? "My Collection" : `${profileUser.username}'s Collection`}</h4>
       {profileUser.collection && profileUser.collection.length > 0 ? (
-        <div className="card-grid">
-          {profileUser.collection.map(card => (
-            // MODIFIED LINE BELOW TO APPLY GRADIENT BORDER FOR OWNED CARDS
-            <div key={card._id} className={`photocard ${isOwnProfile ? 'photocard-owned-gradient-border' : ''}`}>
-              <img src={card.image} alt={`${card.member} - ${card.album}`} className="card-img" />
-              <div className="card-info">
-                <h3 className="card-title">{card.member}</h3>
-                <p className="card-album">{card.album}</p>
-              </div>
-              {isOwnProfile && (
-                <div className="card-actions">
-                  <button 
-                    onClick={() => handleToggleForTrade(card._id)} 
-                    className={`trade-toggle ${card.for_trade ? 'active' : ''}`}
-                  >
-                    {card.for_trade ? 'Available for Trade' : 'Keep in Collection'}
-                  </button>
-                </div>
-              )}
-              {!isOwnProfile && card.for_trade && (
-                 <div className="card-actions"><span className="status-badge available">For Trade</span></div>
-              )}
-            </div>
-          ))}
+        <div className="card-grid"> {/* Ensure .card-grid is styled for layout */}
+          {profileUser.collection.map(item => {
+            const cardDataForPhotoCard = {
+              _id: item.photocard_id, // Use the actual photocard ID
+              image_url: item.image,
+              member_name: item.member,
+              album_title: item.album,
+              // Add any other fields PhotoCard might expect from the 'card' prop
+            };
+            return (
+              <PhotoCard
+                key={item._id} // Use the user's collection item ID for the key
+                card={cardDataForPhotoCard}
+                userStatus={userCardStatuses[item.photocard_id] || { status: 'owned', quantity: item.quantity || 1, forTrade: item.for_trade || false }}
+                onStatusChange={isOwnProfile ? handleCardStatusChange : () => {}} // Only allow changes on own profile
+              />
+            );
+          })}
         </div>
       ) : (
         <p>{isOwnProfile ? "You have" : "This user has"} no cards in their collection yet.</p>
@@ -159,16 +183,23 @@ const UserProfilePage = ()   => {
     <div className="profile-wishlist">
       <h4>{isOwnProfile ? "My Wishlist" : `${profileUser.username}'s Wishlist`}</h4>
       {profileUser.wishlist && profileUser.wishlist.length > 0 ? (
-        <div className="card-grid">
-          {profileUser.wishlist.map(card => (
-            <div key={card._id} className="photocard card-wanted">
-              <img src={card.image} alt={`${card.member} - ${card.album}`} className="card-img" />
-              <div className="card-info">
-                <h3 className="card-title">{card.member}</h3>
-                <p className="card-album">{card.album}</p>
-              </div>
-            </div>
-          ))}
+        <div className="card-grid"> {/* Ensure .card-grid is styled for layout */}
+          {profileUser.wishlist.map(item => {
+            const cardDataForPhotoCard = {
+              _id: item.photocard_id, // Use the actual photocard ID
+              image_url: item.image,
+              member_name: item.member,
+              album_title: item.album,
+            };
+            return (
+              <PhotoCard
+                key={item._id} // Use the wishlist item ID for the key
+                card={cardDataForPhotoCard}
+                userStatus={userCardStatuses[item.photocard_id] || { status: 'wanted', quantity: 0, forTrade: false }}
+                onStatusChange={isOwnProfile ? handleCardStatusChange : () => {}} // Only allow changes on own profile
+              />
+            );
+          })}
         </div>
       ) : (
         <p>{isOwnProfile ? "You have" : "This user has"} no cards in their wishlist yet.</p>
@@ -184,8 +215,8 @@ const UserProfilePage = ()   => {
           {userTrades.map(trade => (
             <div key={trade._id} className={`trade-item status-${trade.status}`}>
               <div className="trade-header">
-                 <p>Trade with: <strong>{trade.partner.username}</strong></p>
-                 <span className={`status-badge status-${trade.status}`}>{trade.status.replace('-', ' ')}</span>
+                 <p>Trade with: <strong>{trade.partner?.username || 'Unknown User'}</strong></p>
+                 <span className={`status-badge status-${trade.status}`}>{trade.status?.replace('-', ' ')}</span>
               </div>
               <p>Date: {new Date(trade.date).toLocaleDateString()}</p>
               <Link to={`/trades/${trade._id}`} className="btn btn-secondary btn-sm">View Details</Link>

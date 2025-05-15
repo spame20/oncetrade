@@ -26,31 +26,8 @@ header {
     text-decoration: none;
   }
   
-  /* Desktop Navigation */
-  .main-nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-  }
-  
-  .main-nav li {
-    margin-left: 25px;
-  }
-  
-  .main-nav a {
-    font-family: var(--font-secondary);
-    font-size: 1em;
-    font-weight: 500;
-    color: var(--color-text-primary);
-    text-decoration: none;
-    transition: color 0.3s ease;
-  }
-  
-  .main-nav a:hover,
-  .main-nav a.active {
-    color: var(--color-accent);
-  }
+  /* Desktop Navigation (within Header.js, if any was there - this seems to be for Navigation.js mostly) */
+  /* .main-nav ul { ... } was in your Header.css, but main nav is now Navigation.js */
   
   /* Search Bar */
   .search-bar {
@@ -115,75 +92,20 @@ header {
   
   /* Hamburger Menu Icon */
   .hamburger-menu {
-    display: none; /* Hidden by default */
+    display: none; /* Hidden by default, shown by media query */
     font-size: 1.8em; /* Make it a bit larger for touch */
     color: var(--color-text-primary); /* Ensure it has a color */
     cursor: pointer;
     padding: 5px; /* Add some padding for easier clicking */
   }
   
-  /* Mobile Navigation Menu (Dropdown) */
-  .mobile-nav-menu {
-    display: none; /* Hidden by default, shown by JS adding .active class */
-    position: absolute;
-    top: 100%; /* Position below the header */
-    left: 0;
-    right: 0;
-    background-color: var(--color-background-main);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    z-index: 999;
-    border-top: 1px solid var(--color-border-subtle, var(--color-border)); /* Fallback to --color-border */
-  }
-  
-  .mobile-nav-menu.active {
-    display: block;
-  }
-  
-  .mobile-nav-menu ul {
-    list-style: none;
-    padding: 10px 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .mobile-nav-menu li {
-    margin: 0;
-  }
-  
-  .mobile-nav-menu a,
-  .mobile-nav-menu button { /* Style links and buttons consistently */
-    display: block;
-    padding: 15px 20px;
-    font-family: var(--font-secondary);
-    font-size: 1.1em;
-    color: var(--color-text-primary);
-    text-decoration: none;
-    border-bottom: 1px solid var(--color-border-subtle, var(--color-border));
-    transition: background-color 0.2s ease, color 0.2s ease;
-    width: 100%;
-    text-align: left;
-    background: none;
-    border-left: none;
-    border-right: none;
-    cursor: pointer;
-  }
-  
-  .mobile-nav-menu li:last-child a,
-  .mobile-nav-menu li:last-child button {
-    border-bottom: none;
-  }
-  
-  .mobile-nav-menu a:hover,
-  .mobile-nav-menu a.active,
-  .mobile-nav-menu button:hover {
-    background-color: var(--color-background-hover, #f0f0f0); /* Fallback hover color */
-    color: var(--color-accent);
-  }
+  /* Mobile Navigation Menu (Dropdown) - Styles for .mobile-nav-menu in Header.css might be redundant */
+  /* if Navigation.js is now the component being toggled. */
+  /* The .main-navigation.mobile-nav-active in Navigation.css will handle the display of the nav links. */
   
   /* Responsive: Mobile View */
   @media (max-width: 768px) {
-    .main-nav,
+    /* .main-nav, /* This was for desktop nav, which is now in Navigation.js */
     .search-bar,
     .user-menu { /* Hide desktop user menu items */
       display: none;
@@ -199,4 +121,3 @@ header {
       /* justify-content: space-between; is inherited, ensures logo and hamburger are spaced */
     }
   }
-  

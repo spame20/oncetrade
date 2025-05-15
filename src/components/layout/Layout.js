@@ -1,29 +1,25 @@
 import React, { useState } from 'react';
 import Header from './Header';
 import Navigation from './Navigation';
-import Footer from './Footer';
+import Footer from './Footer'; // Assuming you have a Footer component
+// import './Layout.css'; // Optional: if you have specific layout styles - Commented out to fix error
 
 const Layout = ({ children }) => {
   const [isMobileNavVisible, setIsMobileNavVisible] = useState(false);
 
   const toggleMobileNav = () => {
-    console.log('Layout.js: toggleMobileNav function CALLED. Current isMobileNavVisible state BEFORE change:', isMobileNavVisible);
-    setIsMobileNavVisible(prevState => {
-      const newState = !prevState;
-      console.log('Layout.js: isMobileNavVisible state changing FROM:', prevState, 'TO:', newState);
-      return newState;
-    });
+    setIsMobileNavVisible(!isMobileNavVisible);
   };
 
   return (
-    <>
+    <div className="site-layout">
       <Header toggleMobileNav={toggleMobileNav} />
       <Navigation isMobileNavVisible={isMobileNavVisible} toggleMobileNav={toggleMobileNav} />
       <main className="main-content">
         {children}
       </main>
       <Footer />
-    </>
+    </div>
   );
 };
 

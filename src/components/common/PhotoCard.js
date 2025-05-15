@@ -1,14 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import './PhotoCard.css'; // Import the new CSS file
+import './PhotoCard.css';
 
-// Placeholder for custom icons - we will replace these text/unicode characters later
-const OwnedIcon = () => <span className="status-icon owned-icon">✓</span>; // ✓ or custom SVG
-const WantedIcon = () => <span className="status-icon wanted-icon">★</span>; // ★ or custom SVG
-
-const PhotoCard = ({ card, userStatus }) => {
+const PhotoCard = ({ card, userStatus, onStatusChange }) => {
   const { isAuthenticated } = useAuth();
+  const [showQuantityModal, setShowQuantityModal] = useState(false);
+  const [tempQuantity, setTempQuantity] = useState(userStatus?.quantity || 1);
   
   const getCardClassName = () => {
     let baseClass = 'photocard';
@@ -17,45 +15,75 @@ const PhotoCard = ({ card, userStatus }) => {
     if (userStatus.status === 'owned') {
       return `${baseClass} card-owned`;
     }
-    // For wanted/not-interested, we primarily use opacity, border is optional
-    // if (userStatus.status === 'wanted') {
-    //   return `${baseClass} card-wanted`;
-    // }
-    // if (userStatus.status === 'not-interested') {
-    //  return `${baseClass} card-not-interested`;
-    // }
-    return baseClass; // Default if no specific status or not authenticated
+    if (userStatus.status === 'wanted') {
+      return `${baseClass} card-wanted`;
+    }
+    return baseClass;
   };
 
-  // Determine opacity based on status for non-owned cards if user is authenticated
-  const cardStyle = {};
-  if (isAuthenticated && userStatus) {
-    if (userStatus.status === 'wanted') {
-      cardStyle.opacity = 0.85;
+  // Handle status changes
+  const handleStatusToggle = (newStatus) => {
+    if (!isAuthenticated) return;
+    
+    // If clicking the same status, toggle it off
+    if (userStatus && userStatus.status === newStatus) {
+      onStatusChange(card._id, null);
+      return;
     }
-    if (userStatus.status === 'not-interested') {
-      cardStyle.opacity = 0.7;
+    
+    // If clicking "owned", show quantity modal
+    if (newStatus === 'owned') {
+      setTempQuantity(userStatus?.quantity || 1);
+      setShowQuantityModal(true);
+      return;
     }
-  }
+    
+    // Otherwise, update the status directly
+    onStatusChange(card._id, { status: newStatus, quantity: 1 });
+  };
+  
+  // Handle quantity confirmation
+  const handleQuantityConfirm = () => {
+    onStatusChange(card._id, { status: 'owned', quantity: tempQuantity });
+    setShowQuantityModal(false);
+  };
+  
+  // Handle trade toggle
+  const handleTradeToggle = () => {
+    if (!isAuthenticated || !userStatus || userStatus.status !== 'owned') return;
+    
+    const newTradeStatus = !userStatus.forTrade;
+    onStatusChange(card._id, { 
+      ...userStatus, 
+      forTrade: newTradeStatus 
+    });
+  };
 
   return (
-    <div className={getCardClassName()} style={cardStyle}>
-      <Link to={`/photocards/${card._id}`}>
+    <div className={getCardClassName()}>
+      <Link to={`/photocards/${card._id}`} className="card-link">
         <div className="card-img-wrapper">
           <img 
             src={card.image_url || 'https://via.placeholder.com/200x250?text=Photocard'} 
             alt={`${card.member_name || 'Unknown'} - ${card.album_title || 'Album'}`}
             className="card-img"
-            loading="lazy" // Add lazy loading for images
+            loading="lazy"
           />
         </div>
         
-        {isAuthenticated && userStatus && userStatus.status === 'owned' && <OwnedIcon />}
-        {isAuthenticated && userStatus && userStatus.status === 'wanted' && <WantedIcon />}
+        {isAuthenticated && userStatus && userStatus.status === 'owned' && (
+          <div className="status-icon owned-icon">✓</div>
+         )}
+        {isAuthenticated && userStatus && userStatus.status === 'wanted' && (
+          <div className="status-icon wanted-icon">♥</div>
+        )}
+        {isAuthenticated && userStatus && userStatus.status === 'owned' && userStatus.forTrade && (
+          <div className="status-icon trade-icon">★</div>
+        )}
         
-        {isAuthenticated && userStatus && userStatus.status === 'owned' && userStatus.quantity > 0 && (
+        {isAuthenticated && userStatus && userStatus.status === 'owned' && userStatus.quantity > 1 && (
           <div className="quantity-badge">x{userStatus.quantity}</div>
-        ) }
+        )}
         
         <div className="card-info">
           <h3 className="card-title" title={card.member_name || card.member_id?.name || 'Unknown Member'}>
@@ -69,6 +97,59 @@ const PhotoCard = ({ card, userStatus }) => {
           )}
         </div>
       </Link>
+      
+      {isAuthenticated && (
+        <div className="card-actions">
+          <button 
+            className={`action-btn wishlist-btn ${userStatus?.status === 'wanted' ? 'active' : ''}`}
+            onClick={() => handleStatusToggle('wanted')}
+            title="Add to Wishlist"
+          >
+            ♥
+          </button>
+          <button 
+            className={`action-btn owned-btn ${userStatus?.status === 'owned' ? 'active' : ''}`}
+            onClick={() => handleStatusToggle('owned')}
+            title="Add to Collection"
+          >
+            ✓
+          </button>
+          {userStatus && userStatus.status === 'owned' && (
+            <button 
+              className={`action-btn trade-btn ${userStatus.forTrade ? 'active' : ''}`}
+              onClick={handleTradeToggle}
+              title="Available for Trade"
+            >
+              ★
+            </button>
+          )}
+        </div>
+      )}
+      
+      {showQuantityModal && (
+        <div className="quantity-modal">
+          <div className="quantity-modal-content">
+            <h4>How many do you own?</h4>
+            <div className="quantity-controls">
+              <button 
+                onClick={() => setTempQuantity(Math.max(1, tempQuantity - 1))}
+                disabled={tempQuantity <= 1}
+              >-</button>
+              <input 
+                type="number" 
+                min="1" 
+                value={tempQuantity} 
+                onChange={(e) => setTempQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+              />
+              <button onClick={() => setTempQuantity(tempQuantity + 1)}>+</button>
+            </div>
+            <div className="modal-actions">
+              <button onClick={() => setShowQuantityModal(false)}>Cancel</button>
+              <button onClick={handleQuantityConfirm}>Confirm</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
