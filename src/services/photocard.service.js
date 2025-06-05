@@ -1,25 +1,33 @@
-import api from './api';
+import axios from 'axios';
+
+const API_URL = 'http://localhost:6060/api';
 
 class PhotocardService {
   getAllPhotocards() {
-    return api.get('/photocards');
+    return axios.get(`${API_URL}/photocards`);
   }
 
   getPhotocardById(id) {
-    return api.get(`/photocards/${id}`);
+    const cardId = id;
+    console.log("Card ID from URL:", cardId);
+    return axios.get(`${API_URL}/photocards/${id}`).then(cardResponse => {
+      console.log("API Response:", cardResponse.data);
+      return cardResponse;
+    });
   }
 
   getMostWantedCards() {
-    return api.get('/photocards/most-wanted');
+    return axios.get(`${API_URL}/photocards/most-wanted`);
   }
 
   searchPhotocards(query) {
-    return api.get('/photocards/search', { params: { query } });
+    return axios.get(`${API_URL}/photocards/search`, { params: { query } });
   }
 
   filterPhotocards(filters) {
-    return api.get('/photocards/filter', { params: filters });
+    return axios.get(`${API_URL}/photocards/filter`, { params: filters });
   }
 }
 
-export default new PhotocardService();
+const photocardServiceInstance = new PhotocardService();
+export default photocardServiceInstance;

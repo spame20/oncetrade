@@ -1,149 +1,190 @@
 .photocard {
-    position: relative;
-    background-color: white;
-    border-radius: 10px;
+    background-color: var(--color-background-card);
+    border-radius: 6px; /* Slightly less rounded than album cards */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.07);
     overflow: hidden;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-    margin-bottom: 20px;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    position: relative; /* For positioning status icons and badges */
+    text-decoration: none;
+    color: inherit;
   }
   
   .photocard:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    transform: translateY(-4px) scale(1.02); /* Subtle lift and slight scale */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   }
   
-  .card-link {
+  .card-clickable {
+    cursor: pointer;
     text-decoration: none;
     color: inherit;
-    display: block;
+    display: flex;
+    flex-direction: column;
   }
   
-  .card-img-wrapper {
-    position: relative;
+  .card-img-wrapper { /* New wrapper for image */
     width: 100%;
-    height: 240px;
+    padding-top: 125%; /* Aspect ratio for typical photocards (e.g., 4:5). Adjust if needed. */
+    position: relative;
     overflow: hidden;
+    background-color: #f0f0f0; /* Placeholder background */
   }
   
   .card-img {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
   
+  /* Status Indicator Styling */
+  .photocard.card-owned {
+    border: 2px solid var(--color-accent); /* Example: Apricot for owned */
+  }
+  
+  .photocard.card-wanted {
+    /* Optional: a different border or subtle overlay if needed */
+    /* Example: border: 2px solid var(--color-twice-magenta); */
+    opacity: 0.85; /* Slightly faded if wanted but not owned */
+  }
+  
+  .photocard.card-not-interested {
+    opacity: 0.7; /* More faded if not interested */
+  }
+  
+  .status-icon {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: white;
+    z-index: 2;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  
+  .owned-icon {
+    background-color: var(--color-accent); /* Or a specific 'owned' color */
+    /* Replace with custom SVG icon later */
+  }
+  
+  .wanted-icon {
+    background-color: #f0ad4e; /* Example: Orange for wanted */
+    /* Replace with custom SVG icon later */
+  }
+  
+  .quantity-badge {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 0.75em;
+    padding: 3px 6px;
+    border-radius: 10px;
+    font-weight: bold;
+    z-index: 2;
+  }
+  
   .card-info {
-    padding: 15px;
+    padding: 10px;
+    text-align: center;
   }
   
   .card-title {
-    font-size: 16px;
-    margin-bottom: 5px;
+    font-family: var(--font-secondary); /* Raleway for card titles for readability */
+    font-size: 1em;
+    font-weight: 700;
+    margin-bottom: 3px;
+    color: var(--color-text-headings);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   
-  .card-album {
-    font-size: 14px;
-    color: #666;
+  .card-album,
+  .card-type {
+    font-family: var(--font-secondary);
+    font-size: 0.8em;
+    color: var(--color-text-primary);
+    margin-bottom: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   
   .card-type {
-    font-size: 12px;
-    color: #888;
-    margin-top: 5px;
+    font-style: italic;
   }
   
-  /* Status Icons */
-  .status-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    z-index: 2;
-  }
-  
-  .owned-icon {
-    background-color: #4CAF50;
-    color: white;
-  }
-  
-  .wanted-icon {
-    background-color: #FF5252;
-    color: white;
-  }
-  
-  .trade-icon {
-    background-color: #FFC107;
-    color: white;
-    top: 50px; /* Position below the owned icon */
-  }
-  
-  .quantity-badge {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background-color: #5f9eff;
-    color: white;
-    padding: 3px 8px;
-    border-radius: 10px;
-    font-size: 12px;
-    font-weight: bold;
-    z-index: 2;
-  }
-  
-  /* Card Status Styles */
-  .card-owned {
-    border: 2px solid #4CAF50;
-  }
-  
-  .card-wanted {
-    border: 2px solid #FF5252;
-  }
-  
-  /* Action Buttons */
+  /* Action buttons styling */
   .card-actions {
     display: flex;
     justify-content: space-around;
-    padding: 10px;
+    padding: 8px 0;
+    background-color: #f8f8f8;
     border-top: 1px solid #eee;
+  }
+  
+  .tooltip-wrapper {
+    position: relative;
+    display: inline-block;
   }
   
   .action-btn {
     background: none;
     border: none;
-    font-size: 18px;
+    font-size: 1.2em;
     cursor: pointer;
     padding: 5px 10px;
-    border-radius: 5px;
-    transition: all 0.2s;
     color: #888;
+    transition: color 0.2s, transform 0.2s;
   }
   
   .action-btn:hover {
-    background-color: #f5f5f5;
+    transform: scale(1.2);
   }
   
-  .wishlist-btn.active {
-    color: #FF5252;
+  .action-btn.active {
+    color: var(--color-accent);
   }
   
-  .owned-btn.active {
-    color: #4CAF50;
+  .action-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
   
-  .trade-btn.active {
-    color: #FFC107;
+  /* Tooltip styling */
+  .simple-tooltip {
+    visibility: hidden;
+    width: 120px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-size: 0.75rem;
+    pointer-events: none;
+  }
+  
+  .tooltip-wrapper:hover .simple-tooltip {
+    visibility: visible;
+    opacity: 1;
   }
   
   /* Quantity Modal */
@@ -151,65 +192,56 @@
     position: fixed;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     z-index: 1000;
   }
   
   .quantity-modal-content {
     background-color: white;
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     width: 300px;
     max-width: 90%;
   }
   
-  .quantity-controls {
+  .quantity-modal-content h4 {
+    margin-top: 0;
+    margin-bottom: 15px;
+  }
+  
+  .quantity-modal-content input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .quantity-modal-actions {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px 0;
+    justify-content: flex-end;
+    gap: 10px;
   }
   
-  .quantity-controls button {
-    background-color: #f0f0f0;
-    border: none;
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-    cursor: pointer;
-  }
-  
-  .quantity-controls input {
-    width: 60px;
-    height: 40px;
-    text-align: center;
-    margin: 0 10px;
-    font-size: 16px;
-  }
-  
-  .modal-actions {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .modal-actions button {
+  .quantity-modal-actions button {
     padding: 8px 15px;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
   }
   
-  .modal-actions button:first-child {
+  .quantity-modal-actions button:first-child {
     background-color: #f0f0f0;
   }
   
-  .modal-actions button:last-child {
-    background-color: #4CAF50;
+  .quantity-modal-actions button:last-child {
+    background-color: var(--color-accent);
     color: white;
   }
   

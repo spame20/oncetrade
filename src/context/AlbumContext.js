@@ -32,11 +32,17 @@ export const AlbumProvider = ({ children }) => {
       _id: '4',
       name: 'Yes, I Am Chaeyoung',
       cover_image: 'https://via.placeholder.com/300x300?text=Yes+I+Am+Chaeyoung',
-      release_date: '2020-06-01', // Example date
-      total_cards: 30 // Example count
+      release_date: '2020-06-01',
+      total_cards: 30
+    },
+    {
+      _id: '5',
+      name: 'TWICEcoaster: Lane 1', // Add this album
+      cover_image: 'https://via.placeholder.com/300x300?text=TWICEcoaster+Lane+1',
+      release_date: '2016-10-24',
+      total_cards: 50
     }
-    // Add more mock albums as needed
-  ]) ;
+  ]);
 
   // Function to get a single album by its ID
   const getAlbumById = (id) => {

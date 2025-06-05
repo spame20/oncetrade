@@ -1,5 +1,7 @@
 import api from './api';
 
+const API_URL = 'http://localhost:6060/api';
+
 class UserCardService {
   getUserCollection(userId) {
     return api.get(`/usercards/user/${userId}/collection`);

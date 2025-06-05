@@ -22,6 +22,9 @@ import TradeInterfacePage from './components/pages/TradeInterfacePage';
 import MessagingInterfacePage from './components/pages/MessagingInterfacePage';
 import LoginPage from './components/pages/LoginPage';
 import RegisterPage from './components/pages/RegisterPage';
+import CardDetailPage from './components/pages/CardDetailPage';
+import ForgotPasswordPage from './components/pages/ForgotPasswordPage';
+import ResetPasswordPage from './components/pages/ResetPasswordPage';
 
 function App() {
   return (
@@ -34,15 +37,17 @@ function App() {
                 <Route path="/" element={<Layout><HomePage /></Layout>} />
                 <Route path="/albums" element={<Layout><AlbumsListPage /></Layout>} />
                 <Route path="/albums/:albumId" element={<Layout><AlbumViewPage /></Layout>} />
+                <Route path="/cards/:cardId" element={<Layout><CardDetailPage /></Layout>} />
                 <Route path="/profile" element={<Layout><UserProfilePage /></Layout>} />
                 <Route path="/profile/:userId" element={<Layout><UserProfilePage /></Layout>} />
                 <Route path="/wishlist" element={<Layout><WishlistPage /></Layout>} />
                 <Route path="/trades" element={<Layout><TradesListPage /></Layout>} />
                 <Route path="/trades/:tradeId" element={<Layout><TradeInterfacePage /></Layout>} />
                 <Route path="/messages" element={<Layout><MessagingInterfacePage /></Layout>} />
-                <Route path="/messages/:userId" element={<Layout><MessagingInterfacePage /></Layout>} />
-                <Route path="/login" element={<Layout><LoginPage /></Layout>} />
-                <Route path="/register" element={<Layout><RegisterPage /></Layout>} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
               </Routes>
             </Router>
           </PhotocardProvider>

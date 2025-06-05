@@ -1,49 +1,58 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import './Header.css'; // Uses your original Header.css
+import './Header.css'; // Styles will be adjusted for this simpler header
 
-// The toggleMobileNav prop is passed down from Layout.js
-const Header = ({ toggleMobileNav }) => {
+const Header = () => {
   const { isAuthenticated, logout, currentUser: user } = useAuth();
+  const [isMobileNavVisible, setIsMobileNavVisible] = useState(false);
+
+  const toggleMobileNav = () => {
+    setIsMobileNavVisible(!isMobileNavVisible);
+    // This function might need to communicate with Layout.js or Navigation.js
+    // to show/hide the main navigation links on mobile.
+    // We will refine this interaction after Navigation.js is updated.
+  };
 
   return (
-    <header> {/* Ensure your top-level element matches your Header.css, e.g., <header className="site-header-top"> if needed */}
-      <div className="header-content container"> {/* Ensure class names match your Header.css */} 
+    <header className="site-header-top">
+      <div className="header-content container">
         <div className="logo">
           <Link to="/">ONCEtrade</Link>
         </div>
 
-        <div className="search-bar"> {/* Ensure class name matches your Header.css */} 
+        <div className="search-bar">
           <input 
             type="text" 
             placeholder="Search cards, albums, members..." 
           />
         </div>
 
-        {/* Hamburger Menu Icon - onClick calls toggleMobileNav from Layout */} 
-        <div className="hamburger-menu" onClick={toggleMobileNav}>
-          &#9776; {/* Standard hamburger icon */}
-        </div>
-
-        <div className="user-menu"> {/* This is for desktop, ensure it's styled to be hidden on mobile by Header.css */} 
+        <div className="user-menu">
           {isAuthenticated ? (
             <>
-              <span style={{ marginRight: '15px', color: 'var(--color-text-primary)' }}>Hi, {user?.username || 'User'}!</span>
+              <Link to="/profile" className="username-link">
+                <span style={{ marginRight: '15px', color: 'var(--color-text-primary)' }}>
+                  Hi, {user?.username || 'User'}!
+                </span>
+              </Link>
               <button onClick={logout} className="btn btn-secondary">Logout</button>
             </>
           ) : (
             <>
               <Link to="/login" className="btn btn-primary">Login</Link>
               <Link to="/register" className="btn btn-secondary">Register</Link>
-            </>
+            </> 
           )}
         </div>
 
-        {/* If your original Header.css handled a mobile dropdown directly via a class like .mobile-nav-menu, */}
-        {/* that part of the CSS might now be redundant or need adjustment, as Navigation.js will handle the dropdown content. */}
-        {/* The hamburger icon in this component now solely controls the visibility of the Navigation.js component on mobile. */}
+        {/* Hamburger menu - its role will be to toggle the main Navigation.js visibility on mobile */}
+        {/* We might need to move this to Layout.js if it controls Navigation.js directly */}
+        <div className="hamburger-menu" onClick={toggleMobileNav}>
+          &#9776;
+        </div>
       </div>
+      {/* The mobile dropdown menu that was here will be handled by Navigation.js or Layout.js */}
     </header>
   );
 };

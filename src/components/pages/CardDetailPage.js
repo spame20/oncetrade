@@ -18,34 +18,37 @@ const CardDetailPage = () => {
     const fetchCardData = async () => {
       try {
         setLoading(true);
-        
-        // Fetch photocard details
+
+        console.log("Fetching card details for ID:", cardId); // Debug log
+
         const cardResponse = await PhotocardService.getPhotocardById(cardId);
-        setCard(cardResponse.data);
-        
+        console.log("API Response:", cardResponse.data);
+
+        // Always set the card to the actual card object
+        setCard(cardResponse.data.data);
+
         if (isAuthenticated) {
           // Fetch user's card status if authenticated
           try {
             const userCardResponse = await UserCardService.getUserCardStatus(cardId);
             setUserCard(userCardResponse.data);
           } catch (err) {
-            // User doesn't have this card yet, which is fine
-            console.log('User does not have this card yet');
+            console.log('User does not have this card yet'); // Debug log
           }
         }
-        
+
         // Fetch users trading this card
         const tradingResponse = await UserCardService.getUsersTradingCard(cardId);
         setTradingUsers(tradingResponse.data);
-        
+
       } catch (err) {
-        console.error('Error fetching card data:', err);
+        console.error('Error fetching card data:', err); // Debug log
         setError('Failed to load card details. Please try again later.');
       } finally {
         setLoading(false);
       }
     };
-    
+
     if (cardId) {
       fetchCardData();
     }
@@ -102,7 +105,7 @@ const CardDetailPage = () => {
         <div className="card-detail-content">
           <div className="card-image-container">
             <img 
-              src={card.image_url} 
+              src={card.image_url || '/default-image.png'} 
               alt={`${card.member_name} from ${card.album_title}`} 
               className="card-image"
             />

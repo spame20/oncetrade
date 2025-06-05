@@ -12,8 +12,9 @@
   
   .album-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12), 0 0 15px rgba(255, 218, 185, 0.5); /* Apricot glow, adjust opacity */
   }
+  
   
   .album-card a {
     text-decoration: none;
@@ -103,8 +104,5 @@
   .album-cards-count {
     font-weight: 500;
   }
-  .album-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
-  }
+
   

@@ -1,0 +1,45 @@
+.sort-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.filter-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-section label {
+  font-weight: 500;
+  color: #555;
+  white-space: nowrap;
+}
+
+.filter-section select {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  min-width: 120px;
+}
+
+@media (max-width: 768px) {
+  .sort-filter-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .filter-section {
+    width: 100%;
+  }
+  
+  .filter-section select {
+    flex-grow: 1;
+  }
+}
